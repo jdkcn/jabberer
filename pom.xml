@@ -11,6 +11,11 @@
         <name>Jdkcn.com</name>
         <url>http://jdkcn.com</url>
     </organization>
+    <scm>
+        <connection>scm:svn:http://jabberer.googlecode.com/svn</connection>
+        <developerConnection>scm:svn:https://jabberer.googlecode.com/svn</developerConnection>
+        <url>http://code.google.com/p/jabberer/source/browse/</url>
+    </scm>
     <build>
         <plugins>
             <plugin>
