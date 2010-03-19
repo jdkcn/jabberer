@@ -60,6 +60,7 @@ public final class Jabberer {
 		String username = properties.getProperty("username");
 		String password = properties.getProperty("password");
 		String botStatusMessage = properties.getProperty("bot.status.message");
+		Boolean sendOfflineMessage = Boolean.valueOf(properties.getProperty("send.offline.message"));
 		ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
 		final XMPPConnection connection = new XMPPConnection(connConfig);
 		connection.connect();
@@ -93,7 +94,7 @@ public final class Jabberer {
 		final Collection<RosterEntry> entries = roster.getEntries();
 		ChatManager chatManager = connection.getChatManager();
 
-		final MessageListener messageListener = new BotMessageListener(connection, roster, entries, true);
+		final MessageListener messageListener = new BotMessageListener(connection, roster, entries, sendOfflineMessage);
 
 		chatManager.addChatListener(new ChatManagerListener() {
 			@Override

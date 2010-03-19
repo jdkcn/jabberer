@@ -103,7 +103,7 @@ public class BotMessageListener implements MessageListener {
 	private void processCommand(String command, String sender) {
 		if ("/l".equalsIgnoreCase(command) || "/list".equalsIgnoreCase(command)) {
 			Message message = new Message(sender, Message.Type.chat);
-			message.setBody("好友列表：\n" + getRosterEntryNames(" \n"));
+			message.setBody("\nUsers：\n" + getRosterEntryNames(" \n"));
 			try {
 				connection.getChatManager().createChat(sender, new MessageListener() {
 					public void processMessage(Chat chat, Message msg) {
@@ -115,7 +115,24 @@ public class BotMessageListener implements MessageListener {
 			}
 		} else if ("/?".equalsIgnoreCase(command) || "/h".equalsIgnoreCase(command) || "/help".equalsIgnoreCase(command)) {
 			Message message = new Message(sender, Message.Type.chat);
-			message.setBody("好友列表：\n" + getRosterEntryNames(" \n"));
+			StringBuffer sb = new StringBuffer();
+			sb.append("\n Jabberer Help：\n");
+			sb.append("\t /help /h /? for help message \n");
+			sb.append("\t /list /l to list all friends. \n");
+			sb.append("\t /online /o to list online friends. \n");
+			message.setBody(sb.toString());
+			try {
+				connection.getChatManager().createChat(sender, new MessageListener() {
+					public void processMessage(Chat chat, Message msg) {
+						// do something..?
+					}
+				}).sendMessage(message);
+			} catch (XMPPException e) {
+				e.printStackTrace();
+			}
+		} else if ("/online".equalsIgnoreCase(command) || "/o".equalsIgnoreCase(command)) {
+			Message message = new Message(sender, Message.Type.chat);
+			message.setBody("\n Online Users:\n" + getRosterEntryNames(true, "\n"));
 			try {
 				connection.getChatManager().createChat(sender, new MessageListener() {
 					public void processMessage(Chat chat, Message msg) {
@@ -129,11 +146,22 @@ public class BotMessageListener implements MessageListener {
 	}
 	
 	private String getRosterEntryNames(String separator) {
+		return getRosterEntryNames(false, separator);
+	}
+	
+	private String getRosterEntryNames(boolean onlineOnly, String separator) {
 		StringBuffer sb = new StringBuffer();
 		for(RosterEntry entry : rosterEntries) {
+			if (onlineOnly) {
+				Presence presence = roster.getPresence(entry.getUser());
+				if (!presence.isAvailable()) {
+					continue;
+				}
+			}
 			sb.append(entry.getUser()).append(separator);
 		}
-		return sb.toString();
+		return "\t" + sb.toString();
 	}
+	
 
 }
