@@ -11,6 +11,16 @@
         <name>Jdkcn.com</name>
         <url>http://jdkcn.com</url>
     </organization>
+    <repositories>
+        <repository>
+            <id>Jdkcn</id>
+            <name>Jdkcn.com's maven repository</name>
+            <url>http://maven.jdkcn.com</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <scm>
         <connection>scm:svn:http://jabberer.googlecode.com/svn</connection>
         <developerConnection>scm:svn:https://jabberer.googlecode.com/svn</developerConnection>
