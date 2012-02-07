@@ -102,6 +102,7 @@ public final class Jabberer {
 				chat.addMessageListener(messageListener);
 			}
 		});
+		Thread.sleep(50000000);
 		System.out.println("Use 'quit' or 'exit' to disconnect");
 		Console console = System.console();
 		String command = console.readLine();

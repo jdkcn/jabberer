@@ -68,6 +68,7 @@ public class BotMessageListener implements MessageListener {
 	public void processMessage(Chat chat, Message message) {
 		String body = StringUtils.trim(message.getBody());
 		String from = message.getFrom();
+		System.out.println(from);
 		String name = org.jivesoftware.smack.util.StringUtils.parseName(from);
 		String server = org.jivesoftware.smack.util.StringUtils.parseServer(from);
 		String sender = name + "@" + server;
@@ -85,7 +86,7 @@ public class BotMessageListener implements MessageListener {
 					}
 					System.out.println("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
 					Message msg = new Message(entry.getUser(), Message.Type.chat);
-					msg.setBody("<" + entry.getName() + "> " + body);
+					msg.setBody("<" + findPosterName(sender, name) + "> " + body);
 					try {
 						connection.getChatManager().createChat(entry.getUser(), new MessageListener() {
 							public void processMessage(Chat chat, Message msg) {
@@ -100,6 +101,22 @@ public class BotMessageListener implements MessageListener {
 		}
 	}
 	
+	/**
+	 * @param sender
+	 * @param name
+	 * @return
+	 */
+	private String findPosterName(String sender, String name) {
+		for (RosterEntry entry : rosterEntries) {
+			if (entry.getUser().equalsIgnoreCase(sender)) {
+				if (StringUtils.isNotBlank(entry.getName())) {
+					return entry.getName();
+				}
+			}
+		}
+		return name;
+	}
+
 	private void processCommand(String command, String sender) {
 		if ("/l".equalsIgnoreCase(command) || "/list".equalsIgnoreCase(command)) {
 			Message message = new Message(sender, Message.Type.chat);
@@ -158,7 +175,10 @@ public class BotMessageListener implements MessageListener {
 					continue;
 				}
 			}
-			sb.append(entry.getName()).append("[").append(entry.getUser()).append("]").append(separator);
+			if (StringUtils.isNotBlank(entry.getName())) {
+				sb.append(entry.getName());
+			}
+			sb.append(" [").append(entry.getUser()).append("]").append(separator);
 		}
 		return "\t" + sb.toString();
 	}
