@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jdkcn.jabber</groupId>
     <artifactId>jabberer</artifactId>
-    <packaging>jar</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <version>0.9.0-SNAPSHOT</version>
     <name>jabberer</name>
     <description>A sample java jabber bot.</description>
     <url>http://jdkcn.com</url>
@@ -11,20 +11,10 @@
         <name>Jdkcn.com</name>
         <url>http://jdkcn.com</url>
     </organization>
-    <repositories>
-        <repository>
-            <id>Jdkcn</id>
-            <name>Jdkcn.com's maven repository</name>
-            <url>http://maven.jdkcn.com</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
     <scm>
-        <connection>scm:svn:http://jabberer.googlecode.com/svn</connection>
-        <developerConnection>scm:svn:https://jabberer.googlecode.com/svn</developerConnection>
-        <url>http://code.google.com/p/jabberer/source/browse/</url>
+        <connection>scm:git:git://github.com/jdkcn/jabberer.git</connection>
+        <developerConnection>scm:git:git@github.com:jdkcn/jabberer.git</developerConnection>
+        <url>https://github.com/jdkcn/jabberer</url>
     </scm>
     <build>
         <plugins>
@@ -61,24 +51,21 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.jivesoftware</groupId>
+            <groupId>org.igniterealtime.smack</groupId>
             <artifactId>smack</artifactId>
-            <version>3.1.0</version>
-            <type>jar</type>
+            <version>3.2.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.jivesoftware</groupId>
+            <groupId>org.igniterealtime.smack</groupId>
             <artifactId>smackx</artifactId>
-            <version>3.1.0</version>
-            <type>jar</type>
+            <version>3.2.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
+            <version>3.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

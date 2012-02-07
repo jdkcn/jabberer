@@ -83,9 +83,9 @@ public class BotMessageListener implements MessageListener {
 					if (!sendOfflineMessage && !presence.isAvailable()) {
 						continue;
 					}
-					System.out.println("sending to :" + entry.getUser());
+					System.out.println("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
 					Message msg = new Message(entry.getUser(), Message.Type.chat);
-					msg.setBody("<" +name + "> " + body);
+					msg.setBody("<" + entry.getName() + "> " + body);
 					try {
 						connection.getChatManager().createChat(entry.getUser(), new MessageListener() {
 							public void processMessage(Chat chat, Message msg) {
@@ -158,7 +158,7 @@ public class BotMessageListener implements MessageListener {
 					continue;
 				}
 			}
-			sb.append(entry.getUser()).append(separator);
+			sb.append(entry.getName()).append("[").append(entry.getUser()).append("]").append(separator);
 		}
 		return "\t" + sb.toString();
 	}
