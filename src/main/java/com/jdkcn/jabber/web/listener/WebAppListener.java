@@ -5,6 +5,7 @@
  */
 package com.jdkcn.jabber.web.listener;
 
+import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
 import com.google.inject.Guice;
@@ -20,6 +21,22 @@ import com.jdkcn.jabber.web.servlet.IndexServlet;
  */
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		super.contextInitialized(servletContextEvent);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+		super.contextDestroyed(servletContextEvent);
+	}
 
 	/**
 	 * {@inheritDoc}
