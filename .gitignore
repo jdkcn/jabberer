@@ -2,5 +2,5 @@
 .project
 .settings
 src/main/resources/bot.properties
-src/main/resources/bot.json
+src/main/resources/config.json
 target
