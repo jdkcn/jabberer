@@ -34,7 +34,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
-import com.jdkcn.jabber.listener.BotMessageListener;
+import com.jdkcn.jabber.bot.BotMessageListener;
 import com.jdkcn.jabber.util.JsonUtil;
 import com.jdkcn.jabber.web.servlet.IndexServlet;
 

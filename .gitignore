@@ -1,6 +1,5 @@
 .classpath
 .project
 .settings
-src/main/resources/bot.properties
 src/main/resources/config.json
 target

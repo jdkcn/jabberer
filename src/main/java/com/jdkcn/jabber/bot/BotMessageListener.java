@@ -2,7 +2,7 @@
  * Project:jabberer
  * Copyright 2004-2010 Homolo Co., Ltd. All rights reserved.
  */
-package com.jdkcn.jabber.listener;
+package com.jdkcn.jabber.bot;
 
 import java.util.ArrayList;
 import java.util.Collection;

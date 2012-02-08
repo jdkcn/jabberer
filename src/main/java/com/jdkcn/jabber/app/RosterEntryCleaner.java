@@ -32,13 +32,15 @@ package com.jdkcn.jabber.app;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
+import org.codehaus.jackson.JsonNode;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
+
+import com.jdkcn.jabber.util.JsonUtil;
 
 /**
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
@@ -48,14 +50,13 @@ import org.jivesoftware.smack.packet.Presence;
 public class RosterEntryCleaner {
 
 	public static void main(String[] args) throws Exception {
+		JsonNode jsonConfig = JsonUtil.fromJson(RosterEntryCleaner.class.getResourceAsStream("/config.json"), JsonNode.class);
 		List<String> friends = new ArrayList<String>();
-		Properties properties = new Properties();
-		properties.load(Jabberer.class.getResourceAsStream("/bot.properties"));
 		friends.add("friends1@gmail.com");
 		friends.add("friends2@gmail.com");
 		friends.add("friends3@gmail.com");
-		String username = properties.getProperty("username");
-		String password = properties.getProperty("password");
+		String username = jsonConfig.get("username").asText();;
+		String password = jsonConfig.get("password").asText();
 		ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
 		final XMPPConnection connection = new XMPPConnection(connConfig);
 		connection.connect();
