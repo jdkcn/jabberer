@@ -1,13 +1,13 @@
 {
-	"bots":[{
+	"robots":[{
 		"username":"jabberer.bot@gmail.com",
 		"password":"yuanyuan",
-		"bot.status.message":"Just a sample java jabber bot.",
+		"robot.status.message":"Just a sample java jabber robot.",
 		"send.offline.message":true
 	},{
 		"username":"longlifeuglyboy@gmail.com",
-		"password":"xxxxxxx",
-		"bot.status.message":"Just a another sample java jabber bot.",
+		"password":"xxxxx",
+		"robot.status.message":"Just a another sample java jabber robot.",
 		"send.offline.message":true
 	}],
 	"version":"0.9.0-SNAPSHOT"

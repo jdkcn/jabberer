@@ -2,13 +2,13 @@
  * Project:jabberer
  * Copyright 2004-2010 Homolo Co., Ltd. All rights reserved.
  */
-package com.jdkcn.jabber.bot;
+package com.jdkcn.jabber.robot;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
@@ -23,7 +23,7 @@ import org.jivesoftware.smack.packet.Presence;
  * @since Mar 17, 2010 2:40:32 PM
  * @version $Id$
  */
-public class BotMessageListener implements MessageListener {
+public class RobotMessageListener implements MessageListener {
 
 	private List<RosterEntry> rosterEntries = new ArrayList<RosterEntry>();
 	
@@ -50,7 +50,7 @@ public class BotMessageListener implements MessageListener {
     	this.sendOfflineMessage = sendOfflineMessage;
     }
 
-	public BotMessageListener(XMPPConnection connection, Roster roster,Collection<RosterEntry> rosterEntries, Boolean sendOfflineMessage) {
+	public RobotMessageListener(XMPPConnection connection, Roster roster,Collection<RosterEntry> rosterEntries, Boolean sendOfflineMessage) {
 		this.connection = connection;
 		this.roster = roster;
 		this.rosterEntries.addAll(rosterEntries);

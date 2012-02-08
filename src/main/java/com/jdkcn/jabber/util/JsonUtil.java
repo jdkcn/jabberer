@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -57,6 +58,10 @@ public class JsonUtil {
 	
 	public static <T> T fromJson(InputStream is , TypeReference<T> valueTypeRef) throws JsonParseException, IOException {
 		return m.readValue(is, valueTypeRef);
+	}
+	
+	public static <T> T fromJson(JsonNode root, Class<T> valueType) throws JsonParseException, IOException {
+		return m.readValue(root, valueType);
 	}
 	
 	public static String toJson(Object pojo, boolean prettyPrint) throws JsonMappingException, JsonGenerationException, IOException {

@@ -8,8 +8,10 @@ package com.jdkcn.jabber.web.listener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
@@ -30,13 +32,17 @@ import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
-import com.jdkcn.jabber.bot.BotMessageListener;
+import com.jdkcn.jabber.robot.Robot;
+import com.jdkcn.jabber.robot.RobotMessageListener;
 import com.jdkcn.jabber.util.JsonUtil;
+import com.jdkcn.jabber.web.servlet.DisconnectServlet;
 import com.jdkcn.jabber.web.servlet.IndexServlet;
+import com.jdkcn.jabber.web.servlet.ReconnectServlet;
 
 /**
  * @author Rory
@@ -46,19 +52,24 @@ import com.jdkcn.jabber.web.servlet.IndexServlet;
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
 	
+	/**
+	 * 
+	 */
+	public static final String ROBOTS = "ROBOTS";
+
+	/**
+	 * The jabberer json config
+	 */
+	public static final String JABBERERJSONCONFIG = "JABBERERJSONCONFIG";
+
+	/**
+	 * All of the jabber robot's connection
+	 */
+	public static final String XMPPCONNECTION_MAP = "XMPPCONNECTION_MAP";
+	
 	private final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
 	
-	private List<XMPPConnection> connections = new ArrayList<XMPPConnection>();
-	
-	private JsonNode jsonConfig;
-	
-	public List<XMPPConnection> getConnections() {
-		return connections;
-	}
-	
-	public JsonNode getJsonConfig() {
-		return jsonConfig;
-	}
+	private Map<String, XMPPConnection> connectionMap = Maps.newConcurrentMap();
 	
 	/**
 	 * {@inheritDoc}
@@ -67,18 +78,23 @@ public class WebAppListener extends GuiceServletContextListener {
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		super.contextInitialized(servletContextEvent);
 		try {
-			jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
-			for (Iterator<JsonNode> iterator = jsonConfig.get("bots").iterator(); iterator.hasNext();) {
-				JsonNode bot = iterator.next();
-				String username = bot.get("username").asText();
-				String password = bot.get("password").asText();
-				String botStatusMessage = bot.get("bot.status.message").asText();
-				Boolean sendOfflineMessage = bot.get("send.offline.message").getBooleanValue();
+			JsonNode jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
+			servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
+			List<Robot> robots = new ArrayList<Robot>();
+			for (Iterator<JsonNode> iterator = jsonConfig.get("robots").iterator(); iterator.hasNext();) {
+				Robot robot = new Robot();
+				JsonNode robotNode = iterator.next();
+				String username = robotNode.get("username").asText();
+				String password = robotNode.get("password").asText();
+				String robotStatusMessage = robotNode.get("robot.status.message").asText();
+				Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
 				ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
+				connConfig.setCompressionEnabled(true);
+				connConfig.setSASLAuthenticationEnabled(true);
 				XMPPConnection connection  = new XMPPConnection(connConfig);
 				connection.connect();
 				connection.login(username, password);
-				Presence presence = new Presence(Presence.Type.available, botStatusMessage, 0, Presence.Mode.available);
+				Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
 				connection.sendPacket(presence);
 
 				Roster roster = connection.getRoster();
@@ -107,7 +123,7 @@ public class WebAppListener extends GuiceServletContextListener {
 				final Collection<RosterEntry> entries = roster.getEntries();
 				ChatManager chatManager = connection.getChatManager();
 
-				final MessageListener messageListener = new BotMessageListener(connection, roster, entries, sendOfflineMessage);
+				final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage);
 
 				chatManager.addChatListener(new ChatManagerListener() {
 					@Override
@@ -115,9 +131,17 @@ public class WebAppListener extends GuiceServletContextListener {
 						chat.addMessageListener(messageListener);
 					}
 				});
-				logger.info(" bot {} online now.", username);
-				connections.add(connection);
+				logger.info(" robot {} online now.", username);
+				robot.setName(username);
+				robot.setSendOfflineMessage(sendOfflineMessage);
+				robot.setStartTime(new Date());
+				robot.getRosters().addAll(entries);
+				robot.setStatus(Robot.Status.Online);
+				connectionMap.put(username, connection);
+				robots.add(robot);
 			}
+			servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
+			servletContextEvent.getServletContext().setAttribute(XMPPCONNECTION_MAP, connectionMap);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (XMPPException e) {
@@ -131,10 +155,10 @@ public class WebAppListener extends GuiceServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 		super.contextDestroyed(servletContextEvent);
-		for (XMPPConnection connection : connections) {
-			if (connection != null) {
-				logger.info("bot {} disconnect now.", connection.getUser());
-				connection.disconnect();
+		for (Map.Entry<String, XMPPConnection> entry : connectionMap.entrySet()) {
+			if (entry != null && entry.getValue() != null) {
+				logger.info("bot {} disconnect now.", entry.getKey());
+				entry.getValue().disconnect();
 			}
 		}
 	}
@@ -151,6 +175,8 @@ public class WebAppListener extends GuiceServletContextListener {
 			@Override
 			protected void configureServlets() {
 				serve("/index.jsp", "/index.html", "/").with(IndexServlet.class);
+				serve("/robot/reconnect").with(ReconnectServlet.class);
+				serve("/robot/disconnect").with(DisconnectServlet.class);
 			}
 		});
 	}

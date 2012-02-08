@@ -6,13 +6,22 @@
 package com.jdkcn.jabber.web.servlet;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jackson.JsonNode;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
+
 import com.google.inject.Singleton;
+import com.jdkcn.jabber.robot.Robot;
+import com.jdkcn.jabber.web.listener.WebAppListener;
 
 /**
  * @author Rory
@@ -21,14 +30,36 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class IndexServlet extends HttpServlet {
+	
 	private static final long serialVersionUID = -4585928956316091202L;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.setAttribute("name", "Jobs");
+		JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(WebAppListener.JABBERERJSONCONFIG);
+		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(WebAppListener.ROBOTS);
+		Map<String, XMPPConnection> connectionMap = (Map<String, XMPPConnection>) req.getServletContext().getAttribute(WebAppListener.XMPPCONNECTION_MAP);
+		Boolean allRobotsOnline = true;
+		for (Robot robot : robots) {
+			XMPPConnection connection = connectionMap.get(robot.getName());
+			if (connection != null && connection.isConnected()) {
+				robot.getOnlineRosters().clear();
+				Roster roster = connection.getRoster();
+				for (RosterEntry entry : robot.getRosters()) {
+					if (roster.getPresence(entry.getUser()).isAvailable() && !robot.getOnlineRosters().contains(entry)) {
+						robot.getOnlineRosters().add(entry);
+					}
+				}
+			} else {
+				allRobotsOnline = false;
+			}
+		}
+		req.setAttribute("allRobotsOnline", allRobotsOnline);
+		req.setAttribute("robots", robots);
+		req.setAttribute("jsonConfig", jsonConfig);
 		req.getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(req, resp);
 	}
 
