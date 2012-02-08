@@ -10,5 +10,7 @@
 		"robot.status.message":"Just a another sample java jabber robot.",
 		"send.offline.message":true
 	}],
+	"user":"tester",
+	"pass":"tester",
 	"version":"0.9.0-SNAPSHOT"
 }

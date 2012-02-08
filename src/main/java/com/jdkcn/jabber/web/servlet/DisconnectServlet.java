@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.robot.Robot;
-import com.jdkcn.jabber.web.listener.WebAppListener;
+import com.jdkcn.jabber.util.Constants;
 
 /**
  * @author Rory
@@ -42,9 +42,9 @@ public class DisconnectServlet extends HttpServlet {
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String robotName = req.getParameter("robot");
 		@SuppressWarnings("unchecked")
-		Map<String, XMPPConnection> connectionMap = (Map<String, XMPPConnection>) req.getServletContext().getAttribute(WebAppListener.XMPPCONNECTION_MAP);
+		Map<String, XMPPConnection> connectionMap = (Map<String, XMPPConnection>) req.getServletContext().getAttribute(Constants.XMPPCONNECTION_MAP);
 		@SuppressWarnings("unchecked")
-		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(WebAppListener.ROBOTS);
+		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(Constants.ROBOTS);
 		XMPPConnection connection = connectionMap.get(robotName);
 		if (connection != null) {
 			connection.disconnect();
@@ -55,7 +55,7 @@ public class DisconnectServlet extends HttpServlet {
 		} else {
 			logger.error("no connection found with robot {}", robotName);
 		}
-		resp.sendRedirect(req.getContextPath());
+		resp.sendRedirect(req.getContextPath() + "/");
 	}
 
 	/**

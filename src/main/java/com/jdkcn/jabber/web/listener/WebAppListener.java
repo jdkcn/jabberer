@@ -40,9 +40,13 @@ import com.google.inject.servlet.ServletModule;
 import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.robot.RobotMessageListener;
 import com.jdkcn.jabber.util.JsonUtil;
+import com.jdkcn.jabber.web.filter.UserLoginFilter;
 import com.jdkcn.jabber.web.servlet.DisconnectServlet;
 import com.jdkcn.jabber.web.servlet.IndexServlet;
+import com.jdkcn.jabber.web.servlet.LoginServlet;
 import com.jdkcn.jabber.web.servlet.ReconnectServlet;
+
+import static com.jdkcn.jabber.util.Constants.*;
 
 /**
  * @author Rory
@@ -51,21 +55,6 @@ import com.jdkcn.jabber.web.servlet.ReconnectServlet;
  */
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
-	
-	/**
-	 * 
-	 */
-	public static final String ROBOTS = "ROBOTS";
-
-	/**
-	 * The jabberer json config
-	 */
-	public static final String JABBERERJSONCONFIG = "JABBERERJSONCONFIG";
-
-	/**
-	 * All of the jabber robot's connection
-	 */
-	public static final String XMPPCONNECTION_MAP = "XMPPCONNECTION_MAP";
 	
 	private final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
 	
@@ -174,9 +163,11 @@ public class WebAppListener extends GuiceServletContextListener {
 			 */
 			@Override
 			protected void configureServlets() {
+				filter("/index.jsp", "/", "/robot/*").through(UserLoginFilter.class);
 				serve("/index.jsp", "/index.html", "/").with(IndexServlet.class);
 				serve("/robot/reconnect").with(ReconnectServlet.class);
 				serve("/robot/disconnect").with(DisconnectServlet.class);
+				serve("/login").with(LoginServlet.class);
 			}
 		});
 	}

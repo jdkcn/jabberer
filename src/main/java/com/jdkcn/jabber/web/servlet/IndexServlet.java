@@ -21,7 +21,7 @@ import org.jivesoftware.smack.XMPPConnection;
 
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.robot.Robot;
-import com.jdkcn.jabber.web.listener.WebAppListener;
+import com.jdkcn.jabber.util.Constants;
 
 /**
  * @author Rory
@@ -39,9 +39,9 @@ public class IndexServlet extends HttpServlet {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(WebAppListener.JABBERERJSONCONFIG);
-		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(WebAppListener.ROBOTS);
-		Map<String, XMPPConnection> connectionMap = (Map<String, XMPPConnection>) req.getServletContext().getAttribute(WebAppListener.XMPPCONNECTION_MAP);
+		JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(Constants.JABBERERJSONCONFIG);
+		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(Constants.ROBOTS);
+		Map<String, XMPPConnection> connectionMap = (Map<String, XMPPConnection>) req.getServletContext().getAttribute(Constants.XMPPCONNECTION_MAP);
 		Boolean allRobotsOnline = true;
 		for (Robot robot : robots) {
 			XMPPConnection connection = connectionMap.get(robot.getName());
