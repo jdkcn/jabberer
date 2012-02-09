@@ -54,6 +54,7 @@ public class IndexServlet extends HttpServlet {
 					}
 				}
 			} else {
+				robot.getOnlineRosters().clear();
 				allRobotsOnline = false;
 			}
 		}

@@ -22,7 +22,7 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
     	</c:choose>
       <div class="row">
 	      <div class="span8 offset2">
-			<form class="form-horizontal" action="<c:url value="/login"/>" method="post">
+			<form class="form-horizontal" action="<c:url value="/signin"/>" method="post">
 		        <fieldset>
 		          <legend>Sign in Form</legend>
 		          <div class="control-group">

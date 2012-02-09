@@ -20,7 +20,7 @@ import com.jdkcn.jabber.util.Constants;
  * @version $Id$
  */
 @Singleton
-public class UserLoginFilter implements Filter {
+public class UserSigninFilter implements Filter {
 
 	/**
 	 * {@inheritDoc}
@@ -38,8 +38,9 @@ public class UserLoginFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpSession session =  req.getSession();
 		if (session == null || session.getAttribute(Constants.LOGIN_USER) == null) {
-			((HttpServletResponse) response).sendRedirect(req.getContextPath() + "/login");
+			((HttpServletResponse) response).sendRedirect(req.getContextPath() + "/signin");
 		} else {
+			request.setAttribute(Constants.LOGIN_USER, session.getAttribute(Constants.LOGIN_USER));
 			chain.doFilter(request, response);
 		}
 	}

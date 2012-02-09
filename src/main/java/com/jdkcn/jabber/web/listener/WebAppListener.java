@@ -40,11 +40,12 @@ import com.google.inject.servlet.ServletModule;
 import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.robot.RobotMessageListener;
 import com.jdkcn.jabber.util.JsonUtil;
-import com.jdkcn.jabber.web.filter.UserLoginFilter;
+import com.jdkcn.jabber.web.filter.UserSigninFilter;
 import com.jdkcn.jabber.web.servlet.DisconnectServlet;
 import com.jdkcn.jabber.web.servlet.IndexServlet;
-import com.jdkcn.jabber.web.servlet.LoginServlet;
+import com.jdkcn.jabber.web.servlet.SigninServlet;
 import com.jdkcn.jabber.web.servlet.ReconnectServlet;
+import com.jdkcn.jabber.web.servlet.SignoutServlet;
 
 import static com.jdkcn.jabber.util.Constants.*;
 
@@ -163,11 +164,12 @@ public class WebAppListener extends GuiceServletContextListener {
 			 */
 			@Override
 			protected void configureServlets() {
-				filter("/index.jsp", "/", "/robot/*").through(UserLoginFilter.class);
+				filter("/index.jsp", "/", "/robot/*").through(UserSigninFilter.class);
 				serve("/index.jsp", "/index.html", "/").with(IndexServlet.class);
 				serve("/robot/reconnect").with(ReconnectServlet.class);
 				serve("/robot/disconnect").with(DisconnectServlet.class);
-				serve("/login").with(LoginServlet.class);
+				serve("/login", "/signin").with(SigninServlet.class);
+				serve("/logout", "/signout").with(SignoutServlet.class);
 			}
 		});
 	}

@@ -18,7 +18,7 @@ import static com.jdkcn.jabber.util.Constants.*;
  * @version $Id$
  */
 @Singleton
-public class LoginServlet extends HttpServlet {
+public class SigninServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -1108987102277577612L;
 

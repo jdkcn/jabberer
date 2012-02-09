@@ -8,18 +8,35 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 <body>
 	<%@include file="nav.jsp" %>
     <div class="container">
-    	<c:choose>
-    	<c:when test="${allRobotsOnline}">
-		<div class="alert alert-success">
-		  <strong>Congratulations!</strong> Every robot online.
-		</div>
-    	</c:when>
-    	<c:otherwise>
-		<div class="alert">
-		  <strong>Warning!</strong> Some robot not online.
-		</div>
-    	</c:otherwise>
-    	</c:choose>
+    	<div class="row">
+    		<div class="span10">
+		    	<c:choose>
+		    	<c:when test="${allRobotsOnline}">
+				<div class="alert alert-success">
+				  <strong>Congratulations!</strong> Every robot online.
+				</div>
+		    	</c:when>
+		    	<c:otherwise>
+				<div class="alert">
+				  <strong>Warning!</strong> Some robot not online.
+				</div>
+		    	</c:otherwise>
+		    	</c:choose>
+    		</div>
+    		<c:if test="${LOGIN_USER ne null}">
+				<div class="span2">
+					
+					<div class="btn-group">
+	  					<a class="btn btn-info dropdown-toggle" href="#" data-toggle="dropdown">
+	  						<i class="icon-user icon-white"></i> <c:out value="${LOGIN_USER}"></c:out> <span class="caret"></span>
+	  					</a>
+	  					<ul class="dropdown-menu">
+	  						<li><a href="<c:url value="/signout"></c:url>">Sign out</a></li>
+	  					</ul>
+	  				</div>
+				</div>
+			</c:if>
+    	</div>
       <h1>Jabberer gtalk bot</h1>
       	<p>Simple java gtalk bot.</p>
       <div class="row">
