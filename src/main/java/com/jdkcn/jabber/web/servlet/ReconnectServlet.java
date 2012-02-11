@@ -115,7 +115,8 @@ public class ReconnectServlet extends HttpServlet {
 				final Collection<RosterEntry> entries = roster.getEntries();
 				ChatManager chatManager = connection.getChatManager();
 
-				final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage);
+				Robot robot = findRobot(robotName, robots);
+				final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage, robot);
 
 				chatManager.addChatListener(new ChatManagerListener() {
 					@Override
@@ -123,7 +124,6 @@ public class ReconnectServlet extends HttpServlet {
 						chat.addMessageListener(messageListener);
 					}
 				});
-				Robot robot = findRobot(robotName, robots);
 				if (robot != null) {
 					robot.setStartTime(new Date());
 					robot.setStatus(Robot.Status.Online);

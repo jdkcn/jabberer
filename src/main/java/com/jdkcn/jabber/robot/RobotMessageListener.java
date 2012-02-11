@@ -5,6 +5,7 @@
 package com.jdkcn.jabber.robot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,6 +32,8 @@ public class RobotMessageListener implements MessageListener {
 	
 	private XMPPConnection connection;
 	
+	private Robot robot;
+	
 	private boolean sendOfflineMessage = true;
 	
 	private static final List<String> commandList;
@@ -44,15 +47,19 @@ public class RobotMessageListener implements MessageListener {
 		commandList.add("/l");
 		commandList.add("/online");
 		commandList.add("/o");
+		commandList.add("/add");
+		commandList.add("/name");
+		commandList.add("/remove");
 	}
 	
 	public void setSendOfflineMessage(boolean sendOfflineMessage) {
     	this.sendOfflineMessage = sendOfflineMessage;
     }
 
-	public RobotMessageListener(XMPPConnection connection, Roster roster,Collection<RosterEntry> rosterEntries, Boolean sendOfflineMessage) {
+	public RobotMessageListener(XMPPConnection connection, Roster roster,Collection<RosterEntry> rosterEntries, Boolean sendOfflineMessage, Robot robot) {
 		this.connection = connection;
 		this.roster = roster;
+		this.robot = robot;
 		this.rosterEntries.addAll(rosterEntries);
 		if (sendOfflineMessage != null) {
 			this.sendOfflineMessage = sendOfflineMessage; 
@@ -73,7 +80,14 @@ public class RobotMessageListener implements MessageListener {
 		String server = org.jivesoftware.smack.util.StringUtils.parseServer(from);
 		String sender = name + "@" + server;
 		if (message.getType() == Message.Type.chat && StringUtils.isNotBlank(body)) {
-			if (commandList.contains(body.toLowerCase())) {
+			boolean isCommand = false;
+			for (String command : commandList) {
+				if (body.toLowerCase().startsWith(command)) {
+					isCommand = true;
+					break;
+				}
+			}
+			if (isCommand) {
 				processCommand(body, sender);
 			} else {
 				for (RosterEntry entry : rosterEntries) {
@@ -137,6 +151,8 @@ public class RobotMessageListener implements MessageListener {
 			sb.append("\t /help /h /? for help message \n");
 			sb.append("\t /list /l to list all friends. \n");
 			sb.append("\t /online /o to list online friends. \n");
+			sb.append("\t /add <account> <nickname> [groupname]... to add a user as friends. \n");
+			sb.append("\t /name <account> <nickname> set a nickname to a user. \n");
 			message.setBody(sb.toString());
 			try {
 				connection.getChatManager().createChat(sender, new MessageListener() {
@@ -159,6 +175,108 @@ public class RobotMessageListener implements MessageListener {
 			} catch (XMPPException e) {
 				e.printStackTrace();
 			}
+		} else if (command.startsWith("/add")) {
+			if (robot.getAdministratorNames().indexOf(sender) == -1) {
+				sendNoPermissionMessage(sender);
+			} else {
+				String[] args = StringUtils.split(command.substring(4), " ");
+				if (args == null || args.length == 0) {
+					Message message = new Message(sender, Message.Type.chat);
+					message.setBody("\n args wrong please use:\n \t /add <account> <nickname> [groupname]...");
+					try {
+						connection.getChatManager().createChat(sender, new MessageListener() {
+							public void processMessage(Chat chat, Message msg) {
+								// do something..?
+							}
+						}).sendMessage(message);
+					} catch (XMPPException e) {
+						e.printStackTrace();
+					}
+				} else {
+					try {
+						String nickname = null;
+						if (args.length > 1) {
+							nickname = args[1].trim();
+						}
+						String[] groups = null;
+						if (args.length > 2) {
+							groups = Arrays.copyOfRange(args, 2, args.length);
+						}
+						roster.createEntry(args[0].trim(), nickname, groups);
+					} catch (XMPPException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		} else if (command.startsWith("/name")) {
+			if (robot.getAdministratorNames().indexOf(sender) == -1) {
+				sendNoPermissionMessage(sender);
+			} else {
+				String[] args = StringUtils.split(command.substring(5), " ");
+				if (args == null || args.length < 2) {
+					Message message = new Message(sender, Message.Type.chat);
+					message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
+					try {
+						connection.getChatManager().createChat(sender, new MessageListener() {
+							public void processMessage(Chat chat, Message msg) {
+								// do something..?
+							}
+						}).sendMessage(message);
+					} catch (XMPPException e) {
+						e.printStackTrace();
+					}
+				} else {
+					RosterEntry rosterEntry = roster.getEntry(args[0].trim());
+					if (rosterEntry != null) {
+						rosterEntry.setName(args[1]);
+					}
+				}
+			}
+		} else if (command.startsWith("/remove")) {
+			if (robot.getAdministratorNames().indexOf(sender) == -1) {
+				sendNoPermissionMessage(sender);
+			} else {
+				String[] args = StringUtils.split(command.substring(7), " ");
+				if (args == null || args.length < 1) {
+					Message message = new Message(sender, Message.Type.chat);
+					message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
+					try {
+						connection.getChatManager().createChat(sender, new MessageListener() {
+							public void processMessage(Chat chat, Message msg) {
+								// do something..?
+							}
+						}).sendMessage(message);
+					} catch (XMPPException e) {
+						e.printStackTrace();
+					}
+				} else {
+					try {
+						RosterEntry rosterEntry = roster.getEntry(args[0]);
+						if (rosterEntry != null) {
+							roster.removeEntry(rosterEntry);
+						}
+					} catch (XMPPException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param sender
+	 */
+	private void sendNoPermissionMessage(String sender) {
+		Message message = new Message(sender, Message.Type.chat);
+		message.setBody("\n no permission to add more entry.");
+		try {
+			connection.getChatManager().createChat(sender, new MessageListener() {
+				public void processMessage(Chat chat, Message msg) {
+					// do something..?
+				}
+			}).sendMessage(message);
+		} catch (XMPPException e) {
+			e.printStackTrace();
 		}
 	}
 	

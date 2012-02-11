@@ -3,12 +3,14 @@
 		"username":"jabberer.bot@gmail.com",
 		"password":"yuanyuan",
 		"robot.status.message":"Just a sample java jabber robot.",
-		"send.offline.message":true
+		"send.offline.message":true,
+		"administrators":["rory.cn@gmail.com"]
 	},{
 		"username":"longlifeuglyboy@gmail.com",
 		"password":"xxxxx",
 		"robot.status.message":"Just a another sample java jabber robot.",
-		"send.offline.message":true
+		"send.offline.message":true,
+		"administrators":["rory.cn@gmail.com"]
 	}],
 	"user":"tester",
 	"pass":"tester",

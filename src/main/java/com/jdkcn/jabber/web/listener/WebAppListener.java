@@ -5,6 +5,10 @@
  */
 package com.jdkcn.jabber.web.listener;
 
+import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
+import static com.jdkcn.jabber.util.Constants.ROBOTS;
+import static com.jdkcn.jabber.util.Constants.XMPPCONNECTION_MAP;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,11 +47,9 @@ import com.jdkcn.jabber.util.JsonUtil;
 import com.jdkcn.jabber.web.filter.UserSigninFilter;
 import com.jdkcn.jabber.web.servlet.DisconnectServlet;
 import com.jdkcn.jabber.web.servlet.IndexServlet;
-import com.jdkcn.jabber.web.servlet.SigninServlet;
 import com.jdkcn.jabber.web.servlet.ReconnectServlet;
+import com.jdkcn.jabber.web.servlet.SigninServlet;
 import com.jdkcn.jabber.web.servlet.SignoutServlet;
-
-import static com.jdkcn.jabber.util.Constants.*;
 
 /**
  * @author Rory
@@ -113,7 +115,7 @@ public class WebAppListener extends GuiceServletContextListener {
 				final Collection<RosterEntry> entries = roster.getEntries();
 				ChatManager chatManager = connection.getChatManager();
 
-				final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage);
+				final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage, robot);
 
 				chatManager.addChatListener(new ChatManagerListener() {
 					@Override
@@ -126,6 +128,7 @@ public class WebAppListener extends GuiceServletContextListener {
 				robot.setSendOfflineMessage(sendOfflineMessage);
 				robot.setStartTime(new Date());
 				robot.getRosters().addAll(entries);
+				findAdministrators(robot, robotNode);
 				robot.setStatus(Robot.Status.Online);
 				connectionMap.put(username, connection);
 				robots.add(robot);
@@ -139,6 +142,24 @@ public class WebAppListener extends GuiceServletContextListener {
 		}
 	}
 	
+	/**
+	 * @param robot
+	 * @param robotNode
+	 */
+	private void findAdministrators(Robot robot, JsonNode robotNode) {
+		List<String> administrators = new ArrayList<String>();
+		robot.getAdministrators().clear();
+		for(Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext();) {
+			JsonNode node = iterator.next();
+			administrators.add(node.asText());
+		}
+		for (RosterEntry entry : robot.getRosters()) {
+			if (administrators.contains(entry.getUser())) {
+				robot.getAdministrators().add(entry);
+			}
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */

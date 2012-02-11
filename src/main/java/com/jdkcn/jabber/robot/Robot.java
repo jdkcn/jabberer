@@ -37,26 +37,31 @@ public class Robot implements Serializable {
 	private Status status;
 
 	public String getOnlineRosterNames() {
-		return parseRosterNames(getOnlineRosters());
+		return parseRosterNames(getOnlineRosters(), false);
 	}
 	
 	public String getRosterNames() {
-		return parseRosterNames(getRosters());
+		return parseRosterNames(getRosters(), false);
 	}
 	
 	public String getAdministratorNames() {
-		return parseRosterNames(getAdministrators());
+		return parseRosterNames(getAdministrators(), true);
 	}
 
 	/**
 	 * @param rosters
+	 * @param showUser
 	 * @return
 	 */
-	private String parseRosterNames(List<RosterEntry> rosters) {
+	private String parseRosterNames(List<RosterEntry> rosters, boolean showUser) {
 		List<String> names = new ArrayList<String>();
 		for (RosterEntry entry : rosters) {
-			if (StringUtils.isNotBlank(entry.getName())) {
-				names.add(entry.getName());
+			String entryName = entry.getName();
+			if (StringUtils.isNotBlank(entryName)) {
+				if (showUser) {
+					entryName += "[" + entry.getUser() + "]";
+				}
+				names.add(entryName);
 			} else {
 				names.add(entry.getUser());
 			}
