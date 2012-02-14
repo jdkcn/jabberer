@@ -66,6 +66,18 @@
 					</connectors>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.jelastic</groupId>
+				<artifactId>jelastic-maven-plugin</artifactId>
+				<version>1.7-SNAPSHOT</version>
+				<configuration>
+					<email>${jelastic.username}</email>
+					<password>${jelastic.password}</password>
+					<context>ROOT</context>
+					<environment>robot</environment>
+					<api_hoster>app.jelastic.servint.net</api_hoster>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -128,4 +140,20 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>plugins-release</name>
+			<url>http://repo.jelastic.servint.net/plugins-release-local</url>
+		</pluginRepository>
+		<pluginRepository>
+			<snapshots />
+			<id>snapshots</id>
+			<name>plugins-snapshot</name>
+			<url>http://repo.jelastic.servint.net/plugins-snapshot-local</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
