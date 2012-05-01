@@ -88,7 +88,7 @@ public class RobotMessageListener implements MessageListener {
 				}
 			}
 			if (isCommand) {
-				processCommand(body, sender);
+				processCommand(chat, body, sender);
 			} else {
 				for (RosterEntry entry : rosterEntries) {
 					if (entry.getUser().equalsIgnoreCase(sender)) {
@@ -102,11 +102,8 @@ public class RobotMessageListener implements MessageListener {
 					Message msg = new Message(entry.getUser(), Message.Type.chat);
 					msg.setBody("<" + findPosterName(sender, name) + "> " + body);
 					try {
-						connection.getChatManager().createChat(entry.getUser(), new MessageListener() {
-							public void processMessage(Chat chat, Message msg) {
-								// do something..?
-							}
-						}).sendMessage(msg);
+						final MessageListener messageListener = new RobotMessageListener(connection, roster, rosterEntries, sendOfflineMessage, robot);
+						connection.getChatManager().createChat(entry.getUser(), messageListener).sendMessage(msg);
 					} catch (XMPPException e) {
 						e.printStackTrace();
 					}
@@ -131,16 +128,12 @@ public class RobotMessageListener implements MessageListener {
 		return name;
 	}
 
-	private void processCommand(String command, String sender) {
+	private void processCommand(Chat chat, String command, String sender) {
 		if ("/l".equalsIgnoreCase(command) || "/list".equalsIgnoreCase(command)) {
 			Message message = new Message(sender, Message.Type.chat);
 			message.setBody("\nUsers：\n" + getRosterEntryNames(" \n"));
 			try {
-				connection.getChatManager().createChat(sender, new MessageListener() {
-					public void processMessage(Chat chat, Message msg) {
-						// do something..?
-					}
-				}).sendMessage(message);
+				chat.sendMessage(message);
 			} catch (XMPPException e) {
 				e.printStackTrace();
 			}
@@ -155,11 +148,7 @@ public class RobotMessageListener implements MessageListener {
 			sb.append("\t /name <account> <nickname> set a nickname to a user. \n");
 			message.setBody(sb.toString());
 			try {
-				connection.getChatManager().createChat(sender, new MessageListener() {
-					public void processMessage(Chat chat, Message msg) {
-						// do something..?
-					}
-				}).sendMessage(message);
+				chat.sendMessage(message);
 			} catch (XMPPException e) {
 				e.printStackTrace();
 			}
@@ -167,28 +156,20 @@ public class RobotMessageListener implements MessageListener {
 			Message message = new Message(sender, Message.Type.chat);
 			message.setBody("\n Online Users:\n" + getRosterEntryNames(true, "\n"));
 			try {
-				connection.getChatManager().createChat(sender, new MessageListener() {
-					public void processMessage(Chat chat, Message msg) {
-						// do something..?
-					}
-				}).sendMessage(message);
+				chat.sendMessage(message);
 			} catch (XMPPException e) {
 				e.printStackTrace();
 			}
 		} else if (command.startsWith("/add")) {
 			if (robot.getAdministratorNames().indexOf(sender) == -1) {
-				sendNoPermissionMessage(sender);
+				sendNoPermissionMessage(chat, sender);
 			} else {
 				String[] args = StringUtils.split(command.substring(4), " ");
 				if (args == null || args.length == 0) {
 					Message message = new Message(sender, Message.Type.chat);
 					message.setBody("\n args wrong please use:\n \t /add <account> <nickname> [groupname]...");
 					try {
-						connection.getChatManager().createChat(sender, new MessageListener() {
-							public void processMessage(Chat chat, Message msg) {
-								// do something..?
-							}
-						}).sendMessage(message);
+						chat.sendMessage(message);
 					} catch (XMPPException e) {
 						e.printStackTrace();
 					}
@@ -210,18 +191,14 @@ public class RobotMessageListener implements MessageListener {
 			}
 		} else if (command.startsWith("/name")) {
 			if (robot.getAdministratorNames().indexOf(sender) == -1) {
-				sendNoPermissionMessage(sender);
+				sendNoPermissionMessage(chat, sender);
 			} else {
 				String[] args = StringUtils.split(command.substring(5), " ");
 				if (args == null || args.length < 2) {
 					Message message = new Message(sender, Message.Type.chat);
 					message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
 					try {
-						connection.getChatManager().createChat(sender, new MessageListener() {
-							public void processMessage(Chat chat, Message msg) {
-								// do something..?
-							}
-						}).sendMessage(message);
+						chat.sendMessage(message);
 					} catch (XMPPException e) {
 						e.printStackTrace();
 					}
@@ -234,18 +211,14 @@ public class RobotMessageListener implements MessageListener {
 			}
 		} else if (command.startsWith("/remove")) {
 			if (robot.getAdministratorNames().indexOf(sender) == -1) {
-				sendNoPermissionMessage(sender);
+				sendNoPermissionMessage(chat, sender);
 			} else {
 				String[] args = StringUtils.split(command.substring(7), " ");
 				if (args == null || args.length < 1) {
 					Message message = new Message(sender, Message.Type.chat);
 					message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
 					try {
-						connection.getChatManager().createChat(sender, new MessageListener() {
-							public void processMessage(Chat chat, Message msg) {
-								// do something..?
-							}
-						}).sendMessage(message);
+						chat.sendMessage(message);
 					} catch (XMPPException e) {
 						e.printStackTrace();
 					}
@@ -264,17 +237,14 @@ public class RobotMessageListener implements MessageListener {
 	}
 
 	/**
+	 * @param chat
 	 * @param sender
 	 */
-	private void sendNoPermissionMessage(String sender) {
+	private void sendNoPermissionMessage(Chat chat, String sender) {
 		Message message = new Message(sender, Message.Type.chat);
 		message.setBody("\n no permission to add more entry.");
 		try {
-			connection.getChatManager().createChat(sender, new MessageListener() {
-				public void processMessage(Chat chat, Message msg) {
-					// do something..?
-				}
-			}).sendMessage(message);
+			chat.sendMessage(message);
 		} catch (XMPPException e) {
 			e.printStackTrace();
 		}
