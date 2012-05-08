@@ -57,7 +57,7 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  			<td><c:choose><c:when test="${robot.sendOfflineMessage}"><span class="label label-info">true</span></c:when><c:otherwise><span class="label">false</span></c:otherwise></c:choose></td>
 			  			<td>
 			  				<div class="btn-group">
-			  					<a class="btn <c:choose><c:when test="${robot.status == 'Offline'}">btn-danger</c:when><c:otherwise>btn-success</c:otherwise></c:choose> dropdown-toggle" href="#" data-toggle="dropdown">
+			  					<a class="btn <c:choose><c:when test="${robot.status == 'Offline'}">btn-warning</c:when><c:when test="${robot.status == 'LoginFailed'}">btn-danger</c:when><c:otherwise>btn-success</c:otherwise></c:choose> dropdown-toggle" href="#" data-toggle="dropdown">
 			  						<i class="icon-leaf icon-white"></i> <c:out value="${robot.status}"></c:out> <span class="caret"></span>
 			  					</a>
 			  					<ul class="dropdown-menu">

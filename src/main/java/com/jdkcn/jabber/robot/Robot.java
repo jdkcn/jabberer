@@ -135,6 +135,6 @@ public class Robot implements Serializable {
 	}
 
 	public static enum Status {
-		Online, Offline
+		Online, Offline, LoginFailed
 	}
 }

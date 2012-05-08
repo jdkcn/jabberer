@@ -31,7 +31,6 @@ import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,70 +73,75 @@ public class WebAppListener extends GuiceServletContextListener {
 			servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
 			List<Robot> robots = new ArrayList<Robot>();
 			for (Iterator<JsonNode> iterator = jsonConfig.get("robots").iterator(); iterator.hasNext();) {
-				Robot robot = new Robot();
 				JsonNode robotNode = iterator.next();
 				String username = robotNode.get("username").asText();
-				String password = robotNode.get("password").asText();
-				String robotStatusMessage = robotNode.get("robot.status.message").asText();
-				Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
-				ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
-				connConfig.setCompressionEnabled(true);
-				connConfig.setSASLAuthenticationEnabled(true);
-				XMPPConnection connection  = new XMPPConnection(connConfig);
-				connection.connect();
-				connection.login(username, password);
-				Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
-				connection.sendPacket(presence);
-
-				Roster roster = connection.getRoster();
-				roster.setSubscriptionMode(SubscriptionMode.reject_all);
-				roster.addRosterListener(new RosterListener() {
-					@Override
-					public void presenceChanged(Presence presence) {
-						// System.out.println("Presence changed: " + presence.getFrom() + " " + presence);
-					}
-
-					@Override
-					public void entriesUpdated(Collection<String> addresses) {
-						System.out.println("entries want updated:" + addresses);
-					}
-
-					@Override
-					public void entriesDeleted(Collection<String> addresses) {
-						System.out.println("entries want deleted:" + addresses);
-					}
-
-					@Override
-					public void entriesAdded(Collection<String> addresses) {
-						System.out.println("entries want added:" + addresses);
-					}
-				});
-				final Collection<RosterEntry> entries = roster.getEntries();
-				ChatManager chatManager = connection.getChatManager();
-
-				final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage, robot);
-
-				chatManager.addChatListener(new ChatManagerListener() {
-					@Override
-					public void chatCreated(Chat chat, boolean createdLocally) {
-						chat.addMessageListener(messageListener);
-					}
-				});
-				logger.info(" robot {} online now.", username);
+				Robot robot = new Robot();
 				robot.setName(username);
+				Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
 				robot.setSendOfflineMessage(sendOfflineMessage);
-				robot.setStartTime(new Date());
-				robot.getRosters().addAll(entries);
 				findAdministrators(robot, robotNode);
-				robot.setStatus(Robot.Status.Online);
-				connectionMap.put(username, connection);
+				try {
+					String password = robotNode.get("password").asText();
+					String robotStatusMessage = robotNode.get("robot.status.message").asText();
+					ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
+					connConfig.setCompressionEnabled(true);
+					connConfig.setSASLAuthenticationEnabled(true);
+					XMPPConnection connection  = new XMPPConnection(connConfig);
+					connection.connect();
+					connection.login(username, password);
+					Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
+					connection.sendPacket(presence);
+
+					Roster roster = connection.getRoster();
+					roster.setSubscriptionMode(SubscriptionMode.reject_all);
+					roster.addRosterListener(new RosterListener() {
+						@Override
+						public void presenceChanged(Presence presence) {
+							// System.out.println("Presence changed: " + presence.getFrom() + " " + presence);
+						}
+
+						@Override
+						public void entriesUpdated(Collection<String> addresses) {
+							System.out.println("entries want updated:" + addresses);
+						}
+
+						@Override
+						public void entriesDeleted(Collection<String> addresses) {
+							System.out.println("entries want deleted:" + addresses);
+						}
+
+						@Override
+						public void entriesAdded(Collection<String> addresses) {
+							System.out.println("entries want added:" + addresses);
+						}
+					});
+					final Collection<RosterEntry> entries = roster.getEntries();
+					ChatManager chatManager = connection.getChatManager();
+
+					final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage, robot);
+
+					chatManager.addChatListener(new ChatManagerListener() {
+						@Override
+						public void chatCreated(Chat chat, boolean createdLocally) {
+							chat.addMessageListener(messageListener);
+						}
+					});
+					logger.info(" robot {} online now.", username);
+					
+					robot.setStartTime(new Date());
+					robot.getRosters().addAll(entries);
+					robot.setStatus(Robot.Status.Online);
+					connectionMap.put(username, connection);
+				} catch (Exception e) {
+					logger.error(String.format(" robot[%s] connect error.", username), e);
+					e.printStackTrace();
+					robot.setStatus(Robot.Status.LoginFailed);
+				}
 				robots.add(robot);
 			}
 			servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
 			servletContextEvent.getServletContext().setAttribute(XMPPCONNECTION_MAP, connectionMap);
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (XMPPException e) {
 			e.printStackTrace();
 		}
 	}
