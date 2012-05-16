@@ -184,6 +184,9 @@ public class RobotMessageListener implements MessageListener {
 							groups = Arrays.copyOfRange(args, 2, args.length);
 						}
 						roster.createEntry(args[0].trim(), nickname, groups);
+						roster = connection.getRoster();
+						robot.getRosters().clear();
+						robot.getRosters().addAll(roster.getEntries());
 					} catch (XMPPException e) {
 						e.printStackTrace();
 					}
@@ -207,6 +210,9 @@ public class RobotMessageListener implements MessageListener {
 					if (rosterEntry != null) {
 						rosterEntry.setName(args[1]);
 					}
+					roster = connection.getRoster();
+					robot.getRosters().clear();
+					robot.getRosters().addAll(roster.getEntries());
 				}
 			}
 		} else if (command.startsWith("/remove")) {
@@ -228,6 +234,9 @@ public class RobotMessageListener implements MessageListener {
 						if (rosterEntry != null) {
 							roster.removeEntry(rosterEntry);
 						}
+						roster = connection.getRoster();
+						robot.getRosters().clear();
+						robot.getRosters().addAll(roster.getEntries());
 					} catch (XMPPException e) {
 						e.printStackTrace();
 					}
