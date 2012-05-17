@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -30,7 +31,7 @@ public class RobotMessageListener implements MessageListener {
 	
 	private Roster roster;
 	
-	private XMPPConnection connection;
+	final private XMPPConnection connection;
 	
 	private Robot robot;
 	
@@ -211,6 +212,7 @@ public class RobotMessageListener implements MessageListener {
 						rosterEntry.setName(args[1]);
 					}
 					roster = connection.getRoster();
+					roster.setSubscriptionMode(SubscriptionMode.reject_all);
 					robot.getRosters().clear();
 					robot.getRosters().addAll(roster.getEntries());
 				}
@@ -235,6 +237,7 @@ public class RobotMessageListener implements MessageListener {
 							roster.removeEntry(rosterEntry);
 						}
 						roster = connection.getRoster();
+						roster.setSubscriptionMode(SubscriptionMode.reject_all);
 						robot.getRosters().clear();
 						robot.getRosters().addAll(roster.getEntries());
 					} catch (XMPPException e) {
@@ -265,7 +268,7 @@ public class RobotMessageListener implements MessageListener {
 	
 	private String getRosterEntryNames(boolean onlineOnly, String separator) {
 		StringBuffer sb = new StringBuffer();
-		for(RosterEntry entry : rosterEntries) {
+		for(RosterEntry entry : roster.getEntries()) {
 			if (onlineOnly) {
 				Presence presence = roster.getPresence(entry.getUser());
 				if (!presence.isAvailable()) {

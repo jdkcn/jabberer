@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.JsonNode;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 
@@ -48,6 +49,7 @@ public class IndexServlet extends HttpServlet {
 			if (connection != null && connection.isConnected()) {
 				robot.getOnlineRosters().clear();
 				Roster roster = connection.getRoster();
+				roster.setSubscriptionMode(SubscriptionMode.reject_all);
 				for (RosterEntry entry : robot.getRosters()) {
 					if (roster.getPresence(entry.getUser()).isAvailable() && !robot.getOnlineRosters().contains(entry)) {
 						robot.getOnlineRosters().add(entry);

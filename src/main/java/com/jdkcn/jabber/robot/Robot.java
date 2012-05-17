@@ -34,7 +34,20 @@ public class Robot implements Serializable {
 	
 	private List<RosterEntry> administrators;
 	
+	private List<String> administratorIds;
+	
 	private Status status;
+
+	public List<String> getAdministratorIds() {
+		if (administratorIds == null) {
+			administratorIds = new ArrayList<String>();
+		}
+		return administratorIds;
+	}
+
+	public void setAdministratorIds(List<String> administratorIds) {
+		this.administratorIds = administratorIds;
+	}
 
 	public String getOnlineRosterNames() {
 		return parseRosterNames(getOnlineRosters(), false);
@@ -45,15 +58,32 @@ public class Robot implements Serializable {
 	}
 	
 	public String getAdministratorNames() {
-		return parseRosterNames(getAdministrators(), true);
+		List<String> nameList = parseRosterNameList(getAdministrators(), true);
+		String names = StringUtils.join(nameList, ",");
+		for (String administratorId : getAdministratorIds()) {
+			if (names.indexOf(administratorId) == -1) {
+				nameList.add(administratorId);
+			}
+		}
+		return StringUtils.join(nameList, ",");
 	}
-
+	
 	/**
 	 * @param rosters
 	 * @param showUser
 	 * @return
 	 */
 	private String parseRosterNames(List<RosterEntry> rosters, boolean showUser) {
+		List<String> names = parseRosterNameList(rosters, showUser);
+		return StringUtils.join(names, "，");
+	}
+	
+	/**
+	 * @param rosters
+	 * @param showUser
+	 * @return
+	 */
+	private List<String> parseRosterNameList(List<RosterEntry> rosters, boolean showUser) {
 		List<String> names = new ArrayList<String>();
 		for (RosterEntry entry : rosters) {
 			String entryName = entry.getName();
@@ -66,7 +96,7 @@ public class Robot implements Serializable {
 				names.add(entry.getUser());
 			}
 		}
-		return StringUtils.join(names, "，");
+		return names;
 	}
 	
 	public Boolean getSendOfflineMessage() {

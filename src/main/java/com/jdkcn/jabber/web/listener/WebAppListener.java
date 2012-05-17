@@ -97,7 +97,7 @@ public class WebAppListener extends GuiceServletContextListener {
 					roster.addRosterListener(new RosterListener() {
 						@Override
 						public void presenceChanged(Presence presence) {
-							// System.out.println("Presence changed: " + presence.getFrom() + " " + presence);
+							 System.out.println("Presence changed: " + presence.getFrom() + " " + presence);
 						}
 
 						@Override
@@ -162,6 +162,7 @@ public class WebAppListener extends GuiceServletContextListener {
 				robot.getAdministrators().add(entry);
 			}
 		}
+		robot.setAdministratorIds(administrators);
 	}
 
 	/**
