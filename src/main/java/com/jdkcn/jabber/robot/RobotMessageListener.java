@@ -146,6 +146,7 @@ public class RobotMessageListener implements MessageListener {
 			sb.append("\t /list /l to list all friends. \n");
 			sb.append("\t /online /o to list online friends. \n");
 			sb.append("\t /add <account> <nickname> [groupname]... to add a user as friends. \n");
+			sb.append("\t /remove <account> to remove a user. \n");
 			sb.append("\t /name <account> <nickname> set a nickname to a user. \n");
 			message.setBody(sb.toString());
 			try {
@@ -224,7 +225,7 @@ public class RobotMessageListener implements MessageListener {
 				String[] args = StringUtils.split(command.substring(7), " ");
 				if (args == null || args.length < 1) {
 					Message message = new Message(sender, Message.Type.chat);
-					message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
+					message.setBody("\n args wrong please use:\n \t /remove <account>");
 					try {
 						chat.sendMessage(message);
 					} catch (XMPPException e) {
