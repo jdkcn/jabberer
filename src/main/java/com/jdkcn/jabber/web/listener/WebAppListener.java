@@ -117,7 +117,6 @@ public class WebAppListener extends GuiceServletContextListener {
 					});
 					final Collection<RosterEntry> entries = roster.getEntries();
 					ChatManager chatManager = connection.getChatManager();
-
 					final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage, robot);
 
 					chatManager.addChatListener(new ChatManagerListener() {
