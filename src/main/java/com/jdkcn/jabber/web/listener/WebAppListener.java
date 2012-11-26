@@ -7,7 +7,6 @@ package com.jdkcn.jabber.web.listener;
 
 import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
 import static com.jdkcn.jabber.util.Constants.ROBOTS;
-import static com.jdkcn.jabber.util.Constants.XMPPCONNECTION_MAP;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
@@ -35,7 +33,6 @@ import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -60,7 +57,7 @@ public class WebAppListener extends GuiceServletContextListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
 	
-	private Map<String, XMPPConnection> connectionMap = Maps.newConcurrentMap();
+	private List<Robot> robots = new ArrayList<Robot>();
 	
 	/**
 	 * {@inheritDoc}
@@ -91,46 +88,48 @@ public class WebAppListener extends GuiceServletContextListener {
 					connection.login(username, password);
 					Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
 					connection.sendPacket(presence);
+					robot.setPassword(password);
+					robot.setConnection(connection);
 
 					Roster roster = connection.getRoster();
 					roster.setSubscriptionMode(SubscriptionMode.reject_all);
 					roster.addRosterListener(new RosterListener() {
 						@Override
 						public void presenceChanged(Presence presence) {
-							 System.out.println("Presence changed: " + presence.getFrom() + " " + presence);
+							 logger.info("Presence changed: " + presence.getFrom() + " " + presence);
 						}
 
 						@Override
 						public void entriesUpdated(Collection<String> addresses) {
-							System.out.println("entries want updated:" + addresses);
+							logger.info("entries want updated:" + addresses);
 						}
 
 						@Override
 						public void entriesDeleted(Collection<String> addresses) {
-							System.out.println("entries want deleted:" + addresses);
+							logger.info("entries want deleted:" + addresses);
 						}
 
 						@Override
 						public void entriesAdded(Collection<String> addresses) {
-							System.out.println("entries want added:" + addresses);
+							logger.info("entries want added:" + addresses);
 						}
 					});
 					final Collection<RosterEntry> entries = roster.getEntries();
+					logger.info(" robot {} online now.", username);
+					
+					robot.setStartTime(new Date());
+					robot.getRosters().addAll(entries);
+					robot.setStatus(Robot.Status.Online);
+					
 					ChatManager chatManager = connection.getChatManager();
-					final MessageListener messageListener = new RobotMessageListener(connection, roster, entries, sendOfflineMessage, robot);
-
+					final MessageListener messageListener = new RobotMessageListener(robot, sendOfflineMessage);
+					
 					chatManager.addChatListener(new ChatManagerListener() {
 						@Override
 						public void chatCreated(Chat chat, boolean createdLocally) {
 							chat.addMessageListener(messageListener);
 						}
 					});
-					logger.info(" robot {} online now.", username);
-					
-					robot.setStartTime(new Date());
-					robot.getRosters().addAll(entries);
-					robot.setStatus(Robot.Status.Online);
-					connectionMap.put(username, connection);
 				} catch (Exception e) {
 					logger.error(String.format(" robot[%s] connect error.", username), e);
 					e.printStackTrace();
@@ -139,7 +138,6 @@ public class WebAppListener extends GuiceServletContextListener {
 				robots.add(robot);
 			}
 			servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
-			servletContextEvent.getServletContext().setAttribute(XMPPCONNECTION_MAP, connectionMap);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -170,10 +168,10 @@ public class WebAppListener extends GuiceServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 		super.contextDestroyed(servletContextEvent);
-		for (Map.Entry<String, XMPPConnection> entry : connectionMap.entrySet()) {
-			if (entry != null && entry.getValue() != null) {
-				logger.info("bot {} disconnect now.", entry.getKey());
-				entry.getValue().disconnect();
+		for (Robot robot : robots) {
+			if (robot.getConnection() != null) {
+				logger.info("bot {} disconnect now.", robot.getName());
+				robot.getConnection().disconnect();
 			}
 		}
 	}

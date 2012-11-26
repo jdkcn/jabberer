@@ -7,7 +7,6 @@ package com.jdkcn.jabber.web.servlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -42,10 +41,9 @@ public class IndexServlet extends HttpServlet {
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(Constants.JABBERERJSONCONFIG);
 		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(Constants.ROBOTS);
-		Map<String, XMPPConnection> connectionMap = (Map<String, XMPPConnection>) req.getServletContext().getAttribute(Constants.XMPPCONNECTION_MAP);
 		Boolean allRobotsOnline = true;
 		for (Robot robot : robots) {
-			XMPPConnection connection = connectionMap.get(robot.getName());
+			XMPPConnection connection = robot.getConnection();
 			if (connection != null && connection.isConnected()) {
 				robot.getOnlineRosters().clear();
 				Roster roster = connection.getRoster();

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 
 /**
  * @author Rory
@@ -23,6 +24,8 @@ public class Robot implements Serializable {
 	private static final long serialVersionUID = -8057823951538493009L;
 
 	private String name;
+	
+	private String password;
 	
 	private Date startTime;
 	
@@ -37,6 +40,24 @@ public class Robot implements Serializable {
 	private List<String> administratorIds;
 	
 	private Status status;
+	
+	private XMPPConnection connection;
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public XMPPConnection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(XMPPConnection connection) {
+		this.connection = connection;
+	}
 
 	public List<String> getAdministratorIds() {
 		if (administratorIds == null) {

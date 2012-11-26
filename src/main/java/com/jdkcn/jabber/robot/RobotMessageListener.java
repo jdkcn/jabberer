@@ -6,7 +6,6 @@ package com.jdkcn.jabber.robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,10 +14,11 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
@@ -26,13 +26,9 @@ import org.jivesoftware.smack.packet.Presence;
  * @version $Id$
  */
 public class RobotMessageListener implements MessageListener {
+	
+	private final Logger logger = LoggerFactory.getLogger(RobotMessageListener.class);
 
-	private List<RosterEntry> rosterEntries = new ArrayList<RosterEntry>();
-	
-	private Roster roster;
-	
-	final private XMPPConnection connection;
-	
 	private Robot robot;
 	
 	private boolean sendOfflineMessage = true;
@@ -57,11 +53,8 @@ public class RobotMessageListener implements MessageListener {
     	this.sendOfflineMessage = sendOfflineMessage;
     }
 
-	public RobotMessageListener(XMPPConnection connection, Roster roster,Collection<RosterEntry> rosterEntries, Boolean sendOfflineMessage, Robot robot) {
-		this.connection = connection;
-		this.roster = roster;
+	public RobotMessageListener(Robot robot, Boolean sendOfflineMessage) {
 		this.robot = robot;
-		this.rosterEntries.addAll(rosterEntries);
 		if (sendOfflineMessage != null) {
 			this.sendOfflineMessage = sendOfflineMessage; 
 		}
@@ -76,7 +69,7 @@ public class RobotMessageListener implements MessageListener {
 	public void processMessage(Chat chat, Message message) {
 		String body = StringUtils.trim(message.getBody());
 		String from = message.getFrom();
-		System.out.println(from);
+		logger.info("process message from:" + from);
 		String name = org.jivesoftware.smack.util.StringUtils.parseName(from);
 		String server = org.jivesoftware.smack.util.StringUtils.parseServer(from);
 		String sender = name + "@" + server;
@@ -91,24 +84,26 @@ public class RobotMessageListener implements MessageListener {
 			if (isCommand) {
 				processCommand(chat, body, sender);
 			} else {
-				for (RosterEntry entry : rosterEntries) {
+				logger.info(StringUtils.center(" sending start ", 50, "#"));
+				for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
 					if (entry.getUser().equalsIgnoreCase(sender)) {
 						continue;
 					}
-					Presence presence = roster.getPresence(entry.getUser());
+					Presence presence = robot.getConnection().getRoster().getPresence(entry.getUser());
 					if (!sendOfflineMessage && !presence.isAvailable()) {
 						continue;
 					}
-					System.out.println("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
+					logger.info("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
 					Message msg = new Message(entry.getUser(), Message.Type.chat);
 					msg.setBody("<" + findPosterName(sender, name) + "> " + body);
 					try {
 //						final MessageListener messageListener = new RobotMessageListener(connection, roster, rosterEntries, sendOfflineMessage, robot);
-						connection.getChatManager().createChat(entry.getUser(), this).sendMessage(msg);
+						robot.getConnection().getChatManager().createChat(entry.getUser(), this).sendMessage(msg);
 					} catch (XMPPException e) {
-						e.printStackTrace();
+						logger.error("send message to:" + entry.getUser(), e);
 					}
 				}
+				logger.info(StringUtils.center(" sent done ", 50, "#"));
 			}
 		}
 	}
@@ -119,7 +114,7 @@ public class RobotMessageListener implements MessageListener {
 	 * @return
 	 */
 	private String findPosterName(String sender, String name) {
-		for (RosterEntry entry : rosterEntries) {
+		for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
 			if (entry.getUser().equalsIgnoreCase(sender)) {
 				if (StringUtils.isNotBlank(entry.getName())) {
 					return entry.getName();
@@ -185,8 +180,8 @@ public class RobotMessageListener implements MessageListener {
 						if (args.length > 2) {
 							groups = Arrays.copyOfRange(args, 2, args.length);
 						}
+						Roster roster = robot.getConnection().getRoster();
 						roster.createEntry(args[0].trim(), nickname, groups);
-						roster = connection.getRoster();
 						robot.getRosters().clear();
 						robot.getRosters().addAll(roster.getEntries());
 					} catch (XMPPException e) {
@@ -208,11 +203,11 @@ public class RobotMessageListener implements MessageListener {
 						e.printStackTrace();
 					}
 				} else {
+					Roster roster = robot.getConnection().getRoster();
 					RosterEntry rosterEntry = roster.getEntry(args[0].trim());
 					if (rosterEntry != null) {
 						rosterEntry.setName(args[1]);
 					}
-					roster = connection.getRoster();
 					roster.setSubscriptionMode(SubscriptionMode.reject_all);
 					robot.getRosters().clear();
 					robot.getRosters().addAll(roster.getEntries());
@@ -233,11 +228,11 @@ public class RobotMessageListener implements MessageListener {
 					}
 				} else {
 					try {
+						Roster roster = robot.getConnection().getRoster();
 						RosterEntry rosterEntry = roster.getEntry(args[0]);
 						if (rosterEntry != null) {
 							roster.removeEntry(rosterEntry);
 						}
-						roster = connection.getRoster();
 						roster.setSubscriptionMode(SubscriptionMode.reject_all);
 						robot.getRosters().clear();
 						robot.getRosters().addAll(roster.getEntries());
@@ -269,9 +264,9 @@ public class RobotMessageListener implements MessageListener {
 	
 	private String getRosterEntryNames(boolean onlineOnly, String separator) {
 		StringBuffer sb = new StringBuffer();
-		for(RosterEntry entry : roster.getEntries()) {
+		for(RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
 			if (onlineOnly) {
-				Presence presence = roster.getPresence(entry.getUser());
+				Presence presence = robot.getConnection().getRoster().getPresence(entry.getUser());
 				if (!presence.isAvailable()) {
 					continue;
 				}
