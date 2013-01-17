@@ -96,12 +96,12 @@ public class WebAppListener extends GuiceServletContextListener {
 					roster.addRosterListener(new RosterListener() {
 						@Override
 						public void presenceChanged(Presence presence) {
-							 logger.info("Presence changed: " + presence.getFrom() + " " + presence);
+//							 logger.info("Presence changed: " + presence.getFrom() + " " + presence);
 						}
 
 						@Override
 						public void entriesUpdated(Collection<String> addresses) {
-							logger.info("entries want updated:" + addresses);
+//							logger.info("entries want updated:" + addresses);
 						}
 
 						@Override
@@ -111,7 +111,7 @@ public class WebAppListener extends GuiceServletContextListener {
 
 						@Override
 						public void entriesAdded(Collection<String> addresses) {
-							logger.info("entries want added:" + addresses);
+//							logger.info("entries want added:" + addresses);
 						}
 					});
 					final Collection<RosterEntry> entries = roster.getEntries();

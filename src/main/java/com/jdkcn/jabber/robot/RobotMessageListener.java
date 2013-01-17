@@ -93,7 +93,7 @@ public class RobotMessageListener implements MessageListener {
 					if (!sendOfflineMessage && !presence.isAvailable()) {
 						continue;
 					}
-					logger.info("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
+					logger.info("sending to :" + entry.getUser() + "[" + entry.getName() + "]" + body);
 					Message msg = new Message(entry.getUser(), Message.Type.chat);
 					msg.setBody("<" + findPosterName(sender, name) + "> " + body);
 					try {
