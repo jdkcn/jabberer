@@ -6,9 +6,15 @@ package com.jdkcn.jabber.robot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
@@ -16,9 +22,14 @@ import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 
 /**
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
@@ -34,6 +45,37 @@ public class RobotMessageListener implements MessageListener {
 	private boolean sendOfflineMessage = true;
 	
 	private static final List<String> commandList;
+	
+	private Cache<String, Message> sentMessageCache;
+	
+	private final ExecutorService executor = Executors.newSingleThreadExecutor();
+	
+	private final BlockingQueue<RetryTask> retryQueue = new ArrayBlockingQueue<RetryTask>(1000);
+	
+	private CacheLoader<String, Message> cacheLoader = new MessageCacheLoader();
+	
+	class MessageCacheLoader extends CacheLoader<String, Message> {
+		private Chat chat;
+		
+		private Message message;
+		
+		public void setChat(Chat chat) {
+			this.chat = chat;
+		}
+		
+		public void setMessage(Message message) {
+			this.message = message;
+		}
+		
+		@Override
+		public Message load(String key) throws Exception {
+			if (chat != null && message != null) {
+				
+			}
+			return null;
+		}
+		
+	}
 	
 	static {
 		commandList = new ArrayList<String>();
@@ -58,6 +100,27 @@ public class RobotMessageListener implements MessageListener {
 		if (sendOfflineMessage != null) {
 			this.sendOfflineMessage = sendOfflineMessage; 
 		}
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						logger.debug("running :");
+						RetryTask task = retryQueue.take();
+						logger.debug("msg :" + task.getMessage().getBody());
+						Message retryMessage = new Message(task.getChat().getParticipant(), Type.chat);
+						retryMessage.setBody("retry send on " + DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss") + "\n" + task.getMessage().getBody());
+						task.getChat().sendMessage(retryMessage);
+						Thread.sleep(30000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (XMPPException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		sentMessageCache = CacheBuilder.newBuilder().maximumSize(2000).build();
 	}
 
 	/**
@@ -67,6 +130,17 @@ public class RobotMessageListener implements MessageListener {
 	 */
 	@Override
 	public void processMessage(Chat chat, Message message) {
+		//if message is failed, need to retry.
+		if (message.getType() == Message.Type.error) {
+			try {
+				RetryTask task = new RetryTask();
+				task.setChat(chat);
+				task.setMessage(message);
+				retryQueue.put(task);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		String body = StringUtils.trim(message.getBody());
 		String from = message.getFrom();
 		logger.info("process message from:" + from);

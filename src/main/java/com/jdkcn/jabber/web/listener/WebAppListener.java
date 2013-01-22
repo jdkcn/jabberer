@@ -127,7 +127,10 @@ public class WebAppListener extends GuiceServletContextListener {
 					chatManager.addChatListener(new ChatManagerListener() {
 						@Override
 						public void chatCreated(Chat chat, boolean createdLocally) {
-							chat.addMessageListener(messageListener);
+							if (!createdLocally) {
+								logger.info(chat.toString() + " 's messageListener:[" + chat.getListeners().size() + "]" + chat.getListeners());
+								chat.addMessageListener(messageListener);
+							}
 						}
 					});
 				} catch (Exception e) {

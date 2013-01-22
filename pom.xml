@@ -54,7 +54,7 @@
 				<version>8.1.0.v20120127</version>
 				<configuration>
 					<!-- http://wiki.eclipse.org/Jetty/Feature/Jetty_Maven_Plugin -->
-					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<scanIntervalSeconds>1000</scanIntervalSeconds>
 					<webApp>
 						<contextPath>/jabberer</contextPath>
 					</webApp>
