@@ -27,8 +27,6 @@ import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 
 /**
@@ -46,13 +44,11 @@ public class RobotMessageListener implements MessageListener {
 	
 	private static final List<String> commandList;
 	
-	private Cache<String, Message> sentMessageCache;
-	
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	private final BlockingQueue<RetryTask> retryQueue = new ArrayBlockingQueue<RetryTask>(1000);
 	
-	private CacheLoader<String, Message> cacheLoader = new MessageCacheLoader();
+//	private CacheLoader<String, Message> cacheLoader = new MessageCacheLoader();
 	
 	class MessageCacheLoader extends CacheLoader<String, Message> {
 		private Chat chat;
@@ -120,7 +116,6 @@ public class RobotMessageListener implements MessageListener {
 				}
 			}
 		});
-		sentMessageCache = CacheBuilder.newBuilder().maximumSize(2000).build();
 	}
 
 	/**
@@ -132,6 +127,7 @@ public class RobotMessageListener implements MessageListener {
 	public void processMessage(Chat chat, Message message) {
 		//if message is failed, need to retry.
 		if (message.getType() == Message.Type.error) {
+			logger.info(String.format("From[%s] to[%s] id[%s] thread[%s]", message.getFrom(), message.getTo(), message.getPacketID(), message.getThread()));
 			try {
 				RetryTask task = new RetryTask();
 				task.setChat(chat);
