@@ -1,5 +1,7 @@
 .classpath
 .project
 .settings
+.idea
+jabberer.iml
 src/main/resources/config.json
 target
