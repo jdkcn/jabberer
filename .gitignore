@@ -3,3 +3,6 @@
 .settings
 src/main/resources/config.json
 target
+.idea
+jabberer.iml
+.DS_Store
