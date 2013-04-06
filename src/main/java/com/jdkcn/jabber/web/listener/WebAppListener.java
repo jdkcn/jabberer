@@ -73,7 +73,8 @@ public class WebAppListener extends GuiceServletContextListener {
 				JsonNode robotNode = iterator.next();
 				String username = robotNode.get("username").asText();
 				Robot robot = new Robot();
-				robot.setName(username);
+				robot.setUsername(username);
+                robot.setName(robotNode.get("name").asText());
 				Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
 				robot.setSendOfflineMessage(sendOfflineMessage);
 				findAdministrators(robot, robotNode);

@@ -24,6 +24,8 @@ public class Robot implements Serializable {
 	private static final long serialVersionUID = -8057823951538493009L;
 
 	private String name;
+
+    private String username;
 	
 	private String password;
 	
@@ -43,7 +45,15 @@ public class Robot implements Serializable {
 	
 	private XMPPConnection connection;
 
-	public String getPassword() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
 		return password;
 	}
 

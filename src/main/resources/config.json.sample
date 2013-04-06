@@ -1,18 +1,27 @@
 {
 	"robots":[{
+	    "name":"irc-robot",
 		"username":"jabberer.bot@gmail.com",
 		"password":"yuanyuan",
 		"robot.status.message":"Just a sample java jabber robot.",
 		"send.offline.message":true,
 		"administrators":["rory.cn@gmail.com"]
 	},{
+	    "name":"staff-robot",
 		"username":"longlifeuglyboy@gmail.com",
 		"password":"xxxxx",
 		"robot.status.message":"Just a another sample java jabber robot.",
 		"send.offline.message":true,
 		"administrators":["rory.cn@gmail.com"]
 	}],
-	"user":"tester",
-	"pass":"tester",
+	"administrators":[{
+        "username":"tester",
+        "password":"tester",
+        "manage.robots":["irc-robot","staff-robot"]
+	},{
+        "username":"staff",
+        "password":"staff",
+        "manage.robots":["staff-robot"]
+    }],
 	"version":"0.9.0-SNAPSHOT"
 }
