@@ -66,14 +66,14 @@ public class SigninServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String user = req.getParameter("user");
         String pass = req.getParameter("pass");
-        boolean isOk = false;
+        User checkedUser = null;
         for (User u : users) {
             if (u.getUsername().equals(user) && u.getPassword().equals(pass)) {
-                isOk = true;
+                checkedUser = u;
             }
         }
-        if (isOk) {
-            req.getSession().setAttribute(LOGIN_USER, user);
+        if (checkedUser != null) {
+            req.getSession().setAttribute(LOGIN_USER, checkedUser);
             resp.sendRedirect(req.getContextPath() + "/");
         } else {
             req.setAttribute("loginError", true);

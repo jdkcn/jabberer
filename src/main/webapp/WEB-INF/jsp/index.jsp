@@ -28,7 +28,7 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 					
 					<div class="btn-group">
 	  					<a class="btn btn-info dropdown-toggle" href="#" data-toggle="dropdown">
-	  						<i class="icon-user icon-white"></i> <c:out value="${LOGIN_USER}"></c:out> <span class="caret"></span>
+	  						<i class="icon-user icon-white"></i> <c:out value="${LOGIN_USER.username}"></c:out> <span class="caret"></span>
 	  					</a>
 	  					<ul class="dropdown-menu">
 	  						<li><a href="<c:url value="/signout"></c:url>">Sign out</a></li>
@@ -44,13 +44,13 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  <table class="table table-bordered">
 			  	<thead>
 			  		<tr>
-			  			<th>Robot</th><th>Start Time</th><th>Online Users</th><th>Administrators</th><th>Send offline</th><th>Status</th>
+			  			<th>Robot</th><th>Start Time</th><th>Online Users</th><th>Administrators</th><th>Send offline</th><th>Status</th><th>#</th>
 			  		</tr>
 			  	</thead>
 			  	<tbody>
 			  		<c:forEach var="robot" items="${robots}">
 			  		<tr>
-			  			<td><c:out value="${robot.name}"/></td>
+			  			<td><c:out value="${robot.name}"/>(<c:out value="${robot.username}"/>)</td>
 			  			<td><fmt:formatDate value="${robot.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 			  			<td><c:out value="${robot.onlineRosterNames}" /></td>
 			  			<td><c:out value="${robot.administratorNames}" /></td>
@@ -66,6 +66,9 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  					</ul>
 			  				</div>
 			  			</td>
+                        <td>
+                            <a href="<c:url value="/robot/addentry"/>" class="btn btn-primary">Add Entry</a>
+                        </td>
 					</tr>
 			  		</c:forEach>
 			  	</tbody>

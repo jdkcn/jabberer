@@ -18,6 +18,7 @@ import java.util.List;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
+import com.jdkcn.jabber.web.servlet.*;
 import org.codehaus.jackson.JsonNode;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
@@ -41,11 +42,6 @@ import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.robot.RobotMessageListener;
 import com.jdkcn.jabber.util.JsonUtil;
 import com.jdkcn.jabber.web.filter.UserSigninFilter;
-import com.jdkcn.jabber.web.servlet.DisconnectServlet;
-import com.jdkcn.jabber.web.servlet.IndexServlet;
-import com.jdkcn.jabber.web.servlet.ReconnectServlet;
-import com.jdkcn.jabber.web.servlet.SigninServlet;
-import com.jdkcn.jabber.web.servlet.SignoutServlet;
 
 /**
  * @author Rory
@@ -194,6 +190,7 @@ public class WebAppListener extends GuiceServletContextListener {
 				serve("/robot/disconnect").with(DisconnectServlet.class);
 				serve("/login", "/signin").with(SigninServlet.class);
 				serve("/logout", "/signout").with(SignoutServlet.class);
+                serve("/robot/addentry").with(AddRosterEntryServlet.class);
 			}
 		});
 	}
