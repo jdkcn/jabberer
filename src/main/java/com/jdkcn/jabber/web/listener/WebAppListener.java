@@ -51,7 +51,7 @@ import com.jdkcn.jabber.web.filter.UserSigninFilter;
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
 	
-	private final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
 	
 	private List<Robot> robots = new ArrayList<Robot>();
 	
@@ -63,75 +63,10 @@ public class WebAppListener extends GuiceServletContextListener {
 		super.contextInitialized(servletContextEvent);
 		try {
 			JsonNode jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
-			servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
+            servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
 			List<Robot> robots = new ArrayList<Robot>();
-			for (Iterator<JsonNode> iterator = jsonConfig.get("robots").iterator(); iterator.hasNext();) {
-				JsonNode robotNode = iterator.next();
-				String username = robotNode.get("username").asText();
-				Robot robot = new Robot();
-				robot.setUsername(username);
-                robot.setName(robotNode.get("name").asText());
-				Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
-				robot.setSendOfflineMessage(sendOfflineMessage);
-				findAdministrators(robot, robotNode);
-				try {
-					String password = robotNode.get("password").asText();
-					String robotStatusMessage = robotNode.get("robot.status.message").asText();
-					ConnectionConfiguration connConfig = new ConnectionConfiguration(robotNode.get("host").asText(), robotNode.get("port").asInt());
-					connConfig.setCompressionEnabled(true);
-					connConfig.setSASLAuthenticationEnabled(true);
-					XMPPConnection connection  = new XMPPConnection(connConfig);
-					connection.connect();
-					connection.login(username, password);
-					Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
-					connection.sendPacket(presence);
-					robot.setPassword(password);
-					robot.setConnection(connection);
-
-					Roster roster = connection.getRoster();
-					roster.setSubscriptionMode(SubscriptionMode.reject_all);
-					roster.addRosterListener(new RosterListener() {
-						@Override
-						public void presenceChanged(Presence presence) {
-							 logger.info("Presence changed: " + presence.getFrom() + " " + presence);
-						}
-
-						@Override
-						public void entriesUpdated(Collection<String> addresses) {
-							logger.info("entries want updated:" + addresses);
-						}
-
-						@Override
-						public void entriesDeleted(Collection<String> addresses) {
-							logger.info("entries want deleted:" + addresses);
-						}
-
-						@Override
-						public void entriesAdded(Collection<String> addresses) {
-							logger.info("entries want added:" + addresses);
-						}
-					});
-					final Collection<RosterEntry> entries = roster.getEntries();
-					logger.info(" robot {} online now.", username);
-					
-					robot.setStartTime(new Date());
-					robot.getRosters().addAll(entries);
-					robot.setStatus(Robot.Status.Online);
-					
-					ChatManager chatManager = connection.getChatManager();
-					final MessageListener messageListener = new RobotMessageListener(robot, sendOfflineMessage);
-					
-					chatManager.addChatListener(new ChatManagerListener() {
-						@Override
-						public void chatCreated(Chat chat, boolean createdLocally) {
-							chat.addMessageListener(messageListener);
-						}
-					});
-				} catch (Exception e) {
-					logger.error(String.format(" robot[%s] connect error.", username), e);
-					e.printStackTrace();
-					robot.setStatus(Robot.Status.LoginFailed);
-				}
+            for (JsonNode robotNode : jsonConfig.get("robots")) {
+                Robot robot = connect(robotNode);
 				robots.add(robot);
 			}
 			servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
@@ -139,12 +74,83 @@ public class WebAppListener extends GuiceServletContextListener {
 			e.printStackTrace();
 		}
 	}
-	
-	/**
+
+    public static Robot connect(JsonNode robotNode) {
+        String username = robotNode.get("username").asText();
+        Robot robot = new Robot();
+        robot.setUsername(username);
+        robot.setName(robotNode.get("name").asText());
+        Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
+        robot.setSendOfflineMessage(sendOfflineMessage);
+        findAdministrators(robot, robotNode);
+        try {
+            String password = robotNode.get("password").asText();
+            String robotStatusMessage = robotNode.get("robot.status.message").asText();
+            ConnectionConfiguration connConfig = new ConnectionConfiguration(robotNode.get("host").asText(), robotNode.get("port").asInt());
+            connConfig.setCompressionEnabled(true);
+            connConfig.setSASLAuthenticationEnabled(true);
+            XMPPConnection connection  = new XMPPConnection(connConfig);
+            connection.connect();
+            connection.login(username, password);
+            Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
+            connection.sendPacket(presence);
+            robot.setPassword(password);
+            robot.setConnection(connection);
+
+            Roster roster = connection.getRoster();
+            roster.setSubscriptionMode(SubscriptionMode.reject_all);
+            roster.addRosterListener(new RosterListener() {
+                @Override
+                public void presenceChanged(Presence presence) {
+                     logger.info("Presence changed: " + presence.getFrom() + " " + presence);
+                }
+
+                @Override
+                public void entriesUpdated(Collection<String> addresses) {
+                    logger.info("entries want updated:" + addresses);
+                }
+
+                @Override
+                public void entriesDeleted(Collection<String> addresses) {
+                    logger.info("entries want deleted:" + addresses);
+                }
+
+                @Override
+                public void entriesAdded(Collection<String> addresses) {
+                    logger.info("entries want added:" + addresses);
+                }
+            });
+            final Collection<RosterEntry> entries = roster.getEntries();
+            logger.info(" robot {} online now.", username);
+
+            robot.setStartTime(new Date());
+            robot.getRosters().addAll(entries);
+            robot.setStatus(Robot.Status.Online);
+
+            ChatManager chatManager = connection.getChatManager();
+            final MessageListener messageListener = new RobotMessageListener(robot, sendOfflineMessage);
+
+            chatManager.addChatListener(new ChatManagerListener() {
+                @Override
+                public void chatCreated(Chat chat, boolean createdLocally) {
+                    chat.addMessageListener(messageListener);
+                }
+            });
+        } catch (Exception e) {
+            logger.error(String.format(" robot[%s] connect error.", username), e);
+            e.printStackTrace();
+            robot.setStatus(Robot.Status.LoginFailed);
+        }
+        return robot;
+    }
+
+
+
+    /**
 	 * @param robot
 	 * @param robotNode
 	 */
-	private void findAdministrators(Robot robot, JsonNode robotNode) {
+	private static void findAdministrators(Robot robot, JsonNode robotNode) {
 		List<String> administrators = new ArrayList<String>();
 		robot.getAdministrators().clear();
 		for(Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext();) {

@@ -24,7 +24,7 @@ public class AddRosterEntryServlet extends HttpServlet {
 
 
     @Override
-    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String robotName = req.getParameter("robotName");
         String entry = req.getParameter("entry");
         String nickname = req.getParameter("nickname");

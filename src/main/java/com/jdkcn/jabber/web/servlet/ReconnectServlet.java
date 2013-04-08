@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jdkcn.jabber.web.listener.WebAppListener;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.jivesoftware.smack.Chat;
@@ -58,82 +59,34 @@ public class ReconnectServlet extends HttpServlet {
 		String robotName = req.getParameter("robot");
 		@SuppressWarnings("unchecked")
 		List<Robot> robots = (List<Robot>) req.getServletContext().getAttribute(Constants.ROBOTS);
+        Robot reconnectRobot = null;
+
 		for (Robot robot : robots) {
 			if (StringUtils.equals(robot.getName(), robotName)) {
-				try {
-					if (robot.getConnection().isConnected()) {
-						robot.getConnection().disconnect();
-					}
-					JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(Constants.JABBERERJSONCONFIG);
-					ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
-					connConfig.setCompressionEnabled(true);
-					connConfig.setSASLAuthenticationEnabled(true);
-					XMPPConnection connection  = new XMPPConnection(connConfig);
-					connection.connect();
-					connection.login(robot.getName(), robot.getPassword());
-					
-					String robotStatusMessage = null;
-					Boolean sendOfflineMessage = null;
-					String username = robotName;
-					String password = null;
-					for (Iterator<JsonNode> iterator = jsonConfig.get("robots").iterator(); iterator.hasNext();) {
-						JsonNode node = iterator.next();
-						if (node.get("username").asText().equalsIgnoreCase(robotName)) {
-							password = node.get("password").asText();
-							robotStatusMessage = node.get("robot.status.message").asText();
-							sendOfflineMessage = node.get("send.offline.message").asBoolean();
-						}
-					}
-					Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
-					connection.sendPacket(presence);
-					robot.setPassword(password);
-					robot.setConnection(connection);
-
-					Roster roster = connection.getRoster();
-					roster.setSubscriptionMode(SubscriptionMode.reject_all);
-					roster.addRosterListener(new RosterListener() {
-						@Override
-						public void presenceChanged(Presence presence) {
-							logger.info("Presence changed: " + presence.getFrom() + " " + presence);
-						}
-
-						@Override
-						public void entriesUpdated(Collection<String> addresses) {
-							logger.info("entries want updated:" + addresses);
-						}
-
-						@Override
-						public void entriesDeleted(Collection<String> addresses) {
-							logger.info("entries want deleted:" + addresses);
-						}
-
-						@Override
-						public void entriesAdded(Collection<String> addresses) {
-							logger.info("entries want added:" + addresses);
-						}
-					});
-					final Collection<RosterEntry> entries = roster.getEntries();
-					ChatManager chatManager = connection.getChatManager();
-					final MessageListener messageListener = new RobotMessageListener(robot, sendOfflineMessage);
-
-					chatManager.addChatListener(new ChatManagerListener() {
-						@Override
-						public void chatCreated(Chat chat, boolean createdLocally) {
-							chat.addMessageListener(messageListener);
-						}
-					});
-					logger.info(" robot {} online now.", username);
-					
-					robot.setStartTime(new Date());
-					robot.getRosters().addAll(entries);
-					robot.setStatus(Robot.Status.Online);
-				} catch (XMPPException e) {
-					logger.error("reconnect robot failed:", e);
-				}
-				break;
-			}
-		}
-		resp.sendRedirect(req.getContextPath() + "/");
+                reconnectRobot = robot;
+            }
+        }
+        if (reconnectRobot != null) {
+            robots.remove(reconnectRobot);
+        }
+        if (reconnectRobot != null) {
+            try {
+                if (reconnectRobot.getConnection().isConnected()) {
+                    reconnectRobot.getConnection().disconnect();
+                }
+                JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(Constants.JABBERERJSONCONFIG);
+                for (JsonNode node : jsonConfig.get("robots")) {
+                    if (node.get("name").asText().equalsIgnoreCase(robotName)) {
+                        reconnectRobot = WebAppListener.connect(node);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("reconnect robot failed:", e);
+            }
+            robots.add(reconnectRobot);
+        }
+        req.getServletContext().setAttribute(Constants.ROBOTS, robots);
+        resp.sendRedirect(req.getContextPath() + "/");
 	}
 	
 }
