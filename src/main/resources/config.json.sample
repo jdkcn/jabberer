@@ -3,6 +3,8 @@
 	    "name":"irc-robot",
 		"username":"jabberer.bot@gmail.com",
 		"password":"yuanyuan",
+		"host":"talk.google.com",
+		"port": 5222,
 		"robot.status.message":"Just a sample java jabber robot.",
 		"send.offline.message":true,
 		"administrators":["rory.cn@gmail.com"]
@@ -10,6 +12,8 @@
 	    "name":"staff-robot",
 		"username":"longlifeuglyboy@gmail.com",
 		"password":"xxxxx",
+		"host":"talk.google.com",
+        "port": 5222,
 		"robot.status.message":"Just a another sample java jabber robot.",
 		"send.offline.message":true,
 		"administrators":["rory.cn@gmail.com"]

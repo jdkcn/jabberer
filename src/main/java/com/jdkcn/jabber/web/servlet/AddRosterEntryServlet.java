@@ -8,13 +8,10 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,8 +22,9 @@ import java.util.List;
 @Singleton
 public class AddRosterEntryServlet extends HttpServlet {
 
+
     @Override
-    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String robotName = req.getParameter("robotName");
         String entry = req.getParameter("entry");
         String nickname = req.getParameter("nickname");
@@ -50,6 +48,6 @@ public class AddRosterEntryServlet extends HttpServlet {
                 }
             }
         }
-        ((HttpServletResponse) res).sendRedirect(((HttpServletRequest) req).getContextPath() + "/");
+        resp.sendRedirect(req.getContextPath() + "/");
     }
 }

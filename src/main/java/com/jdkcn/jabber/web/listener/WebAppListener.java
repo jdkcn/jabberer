@@ -77,7 +77,7 @@ public class WebAppListener extends GuiceServletContextListener {
 				try {
 					String password = robotNode.get("password").asText();
 					String robotStatusMessage = robotNode.get("robot.status.message").asText();
-					ConnectionConfiguration connConfig = new ConnectionConfiguration("im.homolo.com", 5222);
+					ConnectionConfiguration connConfig = new ConnectionConfiguration(robotNode.get("host").asText(), robotNode.get("port").asInt());
 					connConfig.setCompressionEnabled(true);
 					connConfig.setSASLAuthenticationEnabled(true);
 					XMPPConnection connection  = new XMPPConnection(connConfig);
