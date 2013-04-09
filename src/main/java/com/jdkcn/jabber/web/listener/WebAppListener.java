@@ -50,30 +50,30 @@ import com.jdkcn.jabber.web.filter.UserSigninFilter;
  */
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
-	
-	private static final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
-	
-	private List<Robot> robots = new ArrayList<Robot>();
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		super.contextInitialized(servletContextEvent);
-		try {
-			JsonNode jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
+
+    private List<Robot> robots = new ArrayList<Robot>();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+        super.contextInitialized(servletContextEvent);
+        try {
+            JsonNode jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
             servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
-			List<Robot> robots = new ArrayList<Robot>();
+            List<Robot> robots = new ArrayList<Robot>();
             for (JsonNode robotNode : jsonConfig.get("robots")) {
                 Robot robot = connect(robotNode);
-				robots.add(robot);
-			}
-			servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+                robots.add(robot);
+            }
+            servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static Robot connect(JsonNode robotNode) {
         String username = robotNode.get("username").asText();
@@ -107,7 +107,7 @@ public class WebAppListener extends GuiceServletContextListener {
             roster.addRosterListener(new RosterListener() {
                 @Override
                 public void presenceChanged(Presence presence) {
-                     logger.info("Presence changed: " + presence.getFrom() + " " + presence);
+                    logger.info("Presence changed: " + presence.getFrom() + " " + presence);
                 }
 
                 @Override
@@ -152,58 +152,58 @@ public class WebAppListener extends GuiceServletContextListener {
 
 
     /**
-	 * @param robot
-	 * @param robotNode
-	 */
-	private static void findAdministrators(Robot robot, JsonNode robotNode) {
-		List<String> administrators = new ArrayList<String>();
-		robot.getAdministrators().clear();
-		for(Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext();) {
-			JsonNode node = iterator.next();
-			administrators.add(node.asText());
-		}
-		for (RosterEntry entry : robot.getRosters()) {
-			if (administrators.contains(entry.getUser())) {
-				robot.getAdministrators().add(entry);
-			}
-		}
-		robot.setAdministratorIds(administrators);
-	}
+     * @param robot
+     * @param robotNode
+     */
+    private static void findAdministrators(Robot robot, JsonNode robotNode) {
+        List<String> administrators = new ArrayList<String>();
+        robot.getAdministrators().clear();
+        for(Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext();) {
+            JsonNode node = iterator.next();
+            administrators.add(node.asText());
+        }
+        for (RosterEntry entry : robot.getRosters()) {
+            if (administrators.contains(entry.getUser())) {
+                robot.getAdministrators().add(entry);
+            }
+        }
+        robot.setAdministratorIds(administrators);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		super.contextDestroyed(servletContextEvent);
-		for (Robot robot : robots) {
-			if (robot.getConnection() != null) {
-				logger.info("bot {} disconnect now.", robot.getName());
-				robot.getConnection().disconnect();
-			}
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        super.contextDestroyed(servletContextEvent);
+        for (Robot robot : robots) {
+            if (robot.getConnection() != null) {
+                logger.info("bot {} disconnect now.", robot.getName());
+                robot.getConnection().disconnect();
+            }
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Injector getInjector() {
-		return Guice.createInjector(new ServletModule(){
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected void configureServlets() {
-				filter("/index.jsp", "/", "/robot/*").through(UserSigninFilter.class);
-				serve("/index.jsp", "/index.html", "/").with(IndexServlet.class);
-				serve("/robot/reconnect").with(ReconnectServlet.class);
-				serve("/robot/disconnect").with(DisconnectServlet.class);
-				serve("/login", "/signin").with(SigninServlet.class);
-				serve("/logout", "/signout").with(SignoutServlet.class);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Injector getInjector() {
+        return Guice.createInjector(new ServletModule(){
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            protected void configureServlets() {
+                filter("/index.jsp", "/", "/robot/*").through(UserSigninFilter.class);
+                serve("/index.jsp", "/index.html", "/").with(IndexServlet.class);
+                serve("/robot/reconnect").with(ReconnectServlet.class);
+                serve("/robot/disconnect").with(DisconnectServlet.class);
+                serve("/login", "/signin").with(SigninServlet.class);
+                serve("/logout", "/signout").with(SignoutServlet.class);
                 serve("/robot/addentry").with(AddRosterEntryServlet.class);
-			}
-		});
-	}
+            }
+        });
+    }
 
 }
