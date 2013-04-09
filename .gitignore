@@ -1,8 +1,8 @@
 .classpath
 .project
 .settings
-src/main/resources/config.json
-target
 .idea
 jabberer.iml
+src/main/resources/config.json
+target
 .DS_Store
