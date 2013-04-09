@@ -67,14 +67,41 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  				</div>
 			  			</td>
                         <td>
-                            <a href="<c:url value="/robot/addentry"/>" class="btn btn-primary">Add Entry</a>
+                            <a href="#" onclick="javascript:showEntryModal('<c:out value="${robot.name}"/>');return false;" class="btn btn-primary">Add entry</a>
                         </td>
 					</tr>
 			  		</c:forEach>
 			  	</tbody>
 			  </table>
+              <div id="entry-modal" class="modal hide fade">
+                  <form action="<c:url value="/robot/addentry"/>">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          <h3>Add entry into robot</h3>
+                      </div>
+                      <div class="modal-body">
+                          <input type="hidden" name="robotName" id="robotName"/>
+                          <p>
+                              Entry:<input type="text" name="entry" />
+                          </p>
+                          <p>
+                              Nickname:<input type="text" name="nickname" />
+                          </p>
+                      </div>
+                      <div class="modal-footer">
+                          <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                          <button type="submit" class="btn btn-primary">Add</button>
+                      </div>
+                  </form>
+              </div>
 	      </div>
       </div>
     </div> <!-- /container -->
+    <script type="text/javascript">
+        function showEntryModal(robotName) {
+            $('#entry-modal').modal();
+            $('#robotName').val(robotName);
+        }
+    </script>
 </body>
 </html>
