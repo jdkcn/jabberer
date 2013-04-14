@@ -44,7 +44,7 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  <table class="table table-bordered">
 			  	<thead>
 			  		<tr>
-			  			<th>Robot</th><th>Start Time</th><th>Online Users</th><th>Administrators</th><th>Send offline</th><th>Status</th><th>#</th>
+			  			<th>Robot</th><th>Start Time</th><th>Administrators</th><th>Send offline</th><th>Status</th><th>#</th>
 			  		</tr>
 			  	</thead>
 			  	<tbody>
@@ -52,7 +52,6 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  		<tr>
 			  			<td><c:out value="${robot.name}"/>(<c:out value="${robot.username}"/>)</td>
 			  			<td><fmt:formatDate value="${robot.startTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-			  			<td><c:out value="${robot.onlineRosterNames}" /></td>
 			  			<td><c:out value="${robot.administratorNames}" /></td>
 			  			<td><c:choose><c:when test="${robot.sendOfflineMessage}"><span class="label label-info">true</span></c:when><c:otherwise><span class="label">false</span></c:otherwise></c:choose></td>
 			  			<td>
@@ -67,14 +66,27 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  				</div>
 			  			</td>
                         <td>
-                            <a href="#" onclick="javascript:showEntryModal('<c:out value="${robot.name}"/>');return false;" class="btn btn-primary">Add entry</a>
+                            <a href="javascript:void(0)" onclick="javascript:showEntryModal('<c:out value="${robot.name}"/>');return false;" class="btn btn-primary"><i class="icon-plus-sign icon-white"></i> Add entry</a>
                         </td>
 					</tr>
+                    <tr>
+                        <td colspan="6">
+                        <c:forEach var="entry" items="${robot.rosters}">
+                            <div class="btn-group">
+                                <a class="btn btn-info dropdown-toggle" href="#" data-toggle="dropdown"><i class="icon-user icon-white"></i> <c:out value="${entry.name}"/> <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#"><i class="icon-pencil"></i> Edit (<c:out value="${entry.user}"/>)</a></li>
+                                    <li><a href="<c:url value="/entry/remove"/>?robotName=<c:out value="${robot.name}"/>&entry=<c:out value="${entry.user}"/>" onclick="return window.confirm('Really delete this entry?')"><i class="icon-trash"></i> Delete (<c:out value="${entry.user}"/>)</a></li>
+                                </ul>
+                            </div>
+                        </c:forEach> &nbsp;
+                        </td>
+                    </tr>
 			  		</c:forEach>
 			  	</tbody>
 			  </table>
               <div id="entry-modal" class="modal hide fade">
-                  <form action="<c:url value="/robot/addentry"/>">
+                  <form action="<c:url value="/entry/add"/>">
                       <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                           <h3>Add entry into robot</h3>

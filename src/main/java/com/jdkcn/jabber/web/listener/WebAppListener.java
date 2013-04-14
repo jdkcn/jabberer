@@ -20,17 +20,13 @@ import javax.servlet.annotation.WebListener;
 
 import com.jdkcn.jabber.web.servlet.*;
 import org.codehaus.jackson.JsonNode;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManager;
-import org.jivesoftware.smack.ChatManagerListener;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterListener;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +41,8 @@ import com.jdkcn.jabber.web.filter.UserSigninFilter;
 
 /**
  * @author Rory
- * @date Feb 7, 2012
  * @version $Id$
+ * @date Feb 7, 2012
  */
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
@@ -91,40 +87,22 @@ public class WebAppListener extends GuiceServletContextListener {
             if (robotNode.has("service.name")) {
                 serviceName = robotNode.get("service.name").asText();
             }
+            robot.setPassword(password);
+
             ConnectionConfiguration connConfig = new ConnectionConfiguration(host, robotNode.get("port").asInt(), serviceName);
             connConfig.setCompressionEnabled(true);
             connConfig.setSASLAuthenticationEnabled(true);
-            XMPPConnection connection  = new XMPPConnection(connConfig);
+            XMPPConnection connection = new XMPPConnection(connConfig);
             connection.connect();
             connection.login(username, password);
+
             Presence presence = new Presence(Presence.Type.available, robotStatusMessage, 0, Presence.Mode.available);
             connection.sendPacket(presence);
-            robot.setPassword(password);
-            robot.setConnection(connection);
-
             Roster roster = connection.getRoster();
-            roster.setSubscriptionMode(SubscriptionMode.reject_all);
-            roster.addRosterListener(new RosterListener() {
-                @Override
-                public void presenceChanged(Presence presence) {
-                    logger.info("Presence changed: " + presence.getFrom() + " " + presence);
-                }
+            roster.setSubscriptionMode(SubscriptionMode.manual);
+            PacketListener subscriptionListener = new SubscriptionListener(roster, connection);
+            connection.addPacketListener(subscriptionListener, new PacketTypeFilter(Presence.class));
 
-                @Override
-                public void entriesUpdated(Collection<String> addresses) {
-                    logger.info("entries want updated:" + addresses);
-                }
-
-                @Override
-                public void entriesDeleted(Collection<String> addresses) {
-                    logger.info("entries want deleted:" + addresses);
-                }
-
-                @Override
-                public void entriesAdded(Collection<String> addresses) {
-                    logger.info("entries want added:" + addresses);
-                }
-            });
             final Collection<RosterEntry> entries = roster.getEntries();
             logger.info(" robot {} online now.", username);
 
@@ -141,6 +119,7 @@ public class WebAppListener extends GuiceServletContextListener {
                     chat.addMessageListener(messageListener);
                 }
             });
+            robot.setConnection(connection);
         } catch (Exception e) {
             logger.error(String.format(" robot[%s] connect error.", username), e);
             e.printStackTrace();
@@ -150,7 +129,6 @@ public class WebAppListener extends GuiceServletContextListener {
     }
 
 
-
     /**
      * @param robot
      * @param robotNode
@@ -158,7 +136,7 @@ public class WebAppListener extends GuiceServletContextListener {
     private static void findAdministrators(Robot robot, JsonNode robotNode) {
         List<String> administrators = new ArrayList<String>();
         robot.getAdministrators().clear();
-        for(Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext();) {
+        for (Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext(); ) {
             JsonNode node = iterator.next();
             administrators.add(node.asText());
         }
@@ -189,7 +167,7 @@ public class WebAppListener extends GuiceServletContextListener {
      */
     @Override
     protected Injector getInjector() {
-        return Guice.createInjector(new ServletModule(){
+        return Guice.createInjector(new ServletModule() {
             /**
              * {@inheritDoc}
              */
@@ -201,9 +179,54 @@ public class WebAppListener extends GuiceServletContextListener {
                 serve("/robot/disconnect").with(DisconnectServlet.class);
                 serve("/login", "/signin").with(SigninServlet.class);
                 serve("/logout", "/signout").with(SignoutServlet.class);
-                serve("/robot/addentry").with(AddRosterEntryServlet.class);
+                serve("/entry/add").with(AddRosterEntryServlet.class);
+                serve("/entry/remove").with(RemoveRosterEntryServlet.class);
             }
         });
     }
 
+    /**
+     * Deal the subscription manual.
+     */
+    private static class SubscriptionListener implements PacketListener {
+
+        private Roster roster;
+
+        private Connection connection;
+
+        public SubscriptionListener(Roster roster, Connection connection) {
+            this.roster = roster;
+            this.connection = connection;
+        }
+
+        @Override
+        public void processPacket(Packet packet) {
+            if (packet instanceof Presence) {
+                Presence presence = (Presence) packet;
+                String from = presence.getFrom();
+                if (presence.getType() == Presence.Type.subscribe) {
+                    logger.info("receive a subscribe presence.");
+                    if (roster.contains(from)) {
+                        // Accept the subscription request.
+                        Presence response = new Presence(Presence.Type.subscribed);
+                        response.setTo(from);
+                        connection.sendPacket(response);
+                        logger.info("Accept the subscription request from:" + from);
+                    } else {
+                        // Reject the subscription request.
+                        Presence response = new Presence(Presence.Type.unsubscribed);
+                        response.setTo(from);
+                        connection.sendPacket(response);
+                        logger.info("Reject the subscription request from:" + from);
+                    }
+                } else if (presence.getType() == Presence.Type.unsubscribe) {
+                    logger.info("Unsubscribe from:" + from);
+                    Presence response = new Presence(Presence.Type.unsubscribed);
+                    response.setTo(from);
+                    connection.sendPacket(response);
+                }
+            }
+        }
+
+    }
 }

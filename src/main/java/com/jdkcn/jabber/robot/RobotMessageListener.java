@@ -4,21 +4,16 @@
  */
 package com.jdkcn.jabber.robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
@@ -47,10 +42,6 @@ public class RobotMessageListener implements MessageListener {
         commandList.add("/add");
         commandList.add("/name");
         commandList.add("/remove");
-    }
-
-    public void setSendOfflineMessage(boolean sendOfflineMessage) {
-        this.sendOfflineMessage = sendOfflineMessage;
     }
 
     public RobotMessageListener(Robot robot, Boolean sendOfflineMessage) {
@@ -208,7 +199,6 @@ public class RobotMessageListener implements MessageListener {
                     if (rosterEntry != null) {
                         rosterEntry.setName(args[1]);
                     }
-                    roster.setSubscriptionMode(SubscriptionMode.reject_all);
                     robot.getRosters().clear();
                     robot.getRosters().addAll(roster.getEntries());
                 }
@@ -232,8 +222,10 @@ public class RobotMessageListener implements MessageListener {
                         RosterEntry rosterEntry = roster.getEntry(args[0]);
                         if (rosterEntry != null) {
                             roster.removeEntry(rosterEntry);
+                            Presence presence = new Presence(Presence.Type.unsubscribe);
+                            presence.setTo(rosterEntry.getUser());
+                            robot.getConnection().sendPacket(presence);
                         }
-                        roster.setSubscriptionMode(SubscriptionMode.reject_all);
                         robot.getRosters().clear();
                         robot.getRosters().addAll(roster.getEntries());
                     } catch (XMPPException e) {
