@@ -86,19 +86,28 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  	</tbody>
 			  </table>
               <div id="entry-modal" class="modal hide fade">
-                  <form action="<c:url value="/entry/add"/>">
+                  <form>
+
+                  </form>
+                  <form action="<c:url value="/entry/add"/>" class="form-horizontal">
                       <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                           <h3>Add entry into robot</h3>
                       </div>
                       <div class="modal-body">
                           <input type="hidden" name="robotName" id="robotName"/>
-                          <p>
-                              Entry:<input type="text" name="entry" />
-                          </p>
-                          <p>
-                              Nickname:<input type="text" name="nickname" />
-                          </p>
+                          <div class="control-group">
+                              <label class="control-label" for="entry">Entry</label>
+                              <div class="controls">
+                                  <input type="text" id="entry" name="entry" placeholder="bob@example.com">
+                              </div>
+                          </div>
+                          <div class="control-group">
+                              <label class="control-label" for="nickname">Nickname</label>
+                              <div class="controls">
+                                  <input type="text" id="nickname" name="nickname">
+                              </div>
+                          </div>
                       </div>
                       <div class="modal-footer">
                           <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
