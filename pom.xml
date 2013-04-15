@@ -66,18 +66,6 @@
 					</connectors>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.jelastic</groupId>
-				<artifactId>jelastic-maven-plugin</artifactId>
-				<version>1.7-SNAPSHOT</version>
-				<configuration>
-					<email>${jelastic.username}</email>
-					<password>${jelastic.password}</password>
-					<context>ROOT</context>
-					<environment>robot</environment>
-					<api_hoster>app.jelastic.servint.net</api_hoster>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
