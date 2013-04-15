@@ -181,6 +181,7 @@ public class WebAppListener extends GuiceServletContextListener {
                 serve("/logout", "/signout").with(SignoutServlet.class);
                 serve("/entry/add").with(AddRosterEntryServlet.class);
                 serve("/entry/remove").with(RemoveRosterEntryServlet.class);
+                serve("/entry/rename").with(RenameServlet.class);
             }
         });
     }

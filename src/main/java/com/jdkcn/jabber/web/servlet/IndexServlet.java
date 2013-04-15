@@ -51,7 +51,6 @@ public class IndexServlet extends HttpServlet {
             if (connection != null && connection.isConnected()) {
                 robot.getOnlineRosters().clear();
                 Roster roster = connection.getRoster();
-                roster.setSubscriptionMode(SubscriptionMode.reject_all);
                 for (RosterEntry entry : robot.getRosters()) {
                     if (roster.getPresence(entry.getUser()).isAvailable() && !robot.getOnlineRosters().contains(entry)) {
                         robot.getOnlineRosters().add(entry);

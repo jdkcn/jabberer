@@ -37,8 +37,8 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 				</div>
 			</c:if>
     	</div>
-      <h1>Jabberer gtalk bot</h1>
-      	<p>Simple java gtalk bot.</p>
+      <h1>Jabberer bot</h1>
+      	<p>Simple java jabber bot.</p>
       <div class="row">
 	      <div class="span12">
 			  <table class="table table-bordered">
@@ -75,7 +75,7 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
                             <div class="btn-group">
                                 <a class="btn btn-info dropdown-toggle" href="#" data-toggle="dropdown"><i class="icon-user icon-white"></i> <c:out value="${entry.name}"/> <span class="caret"></span></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#"><i class="icon-pencil"></i> Edit (<c:out value="${entry.user}"/>)</a></li>
+                                    <li><a href="javascript:void(0)" onclick="javascript:showRenameModal('<c:out value="${robot.name}"/>','<c:out value="${entry.user}"/>','<c:out value="${entry.name}"/>');return false;"><i class="icon-pencil"></i> Rename (<c:out value="${entry.user}"/>)</a></li>
                                     <li><a href="<c:url value="/entry/remove"/>?robotName=<c:out value="${robot.name}"/>&entry=<c:out value="${entry.user}"/>" onclick="return window.confirm('Really delete this entry?')"><i class="icon-trash"></i> Delete (<c:out value="${entry.user}"/>)</a></li>
                                 </ul>
                             </div>
@@ -86,9 +86,6 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 			  	</tbody>
 			  </table>
               <div id="entry-modal" class="modal hide fade">
-                  <form>
-
-                  </form>
                   <form action="<c:url value="/entry/add"/>" class="form-horizontal">
                       <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -115,6 +112,28 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
                       </div>
                   </form>
               </div>
+              <div id="entry-rename-modal" class="modal hide fade">
+                  <form action="<c:url value="/entry/rename"/>" class="form-horizontal">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          <h3 id="rename-header">Rename entry</h3>
+                      </div>
+                      <div class="modal-body">
+                          <input type="hidden" name="robotName" id="rename-robotName"/>
+                          <input type="hidden" name="entry" id="rename-entry"/>
+                          <div class="control-group">
+                              <label class="control-label" for="nickname">New Name</label>
+                              <div class="controls">
+                                  <input type="text" id="newname" name="newname">
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                          <button type="submit" class="btn btn-primary">Rename</button>
+                      </div>
+                  </form>
+              </div>
 	      </div>
       </div>
     </div> <!-- /container -->
@@ -122,6 +141,13 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
         function showEntryModal(robotName) {
             $('#entry-modal').modal();
             $('#robotName').val(robotName);
+        }
+        function showRenameModal(robotName, entry, name) {
+            $('#entry-rename-modal').modal();
+            $('#rename-robotName').val(robotName);
+            $('#rename-entry').val(entry);
+            $('#newname').attr('placeholder', name);
+            $('#rename-header').html('Rename entry [' + entry +']');
         }
     </script>
 </body>
