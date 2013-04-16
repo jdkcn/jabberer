@@ -1,34 +1,31 @@
 /**
- * Project:jabberer
- * File:WebAppListener.java
- * Copyright 2004-2012 Homolo Co., Ltd. All rights reserved.
+ * Copyright (c) 2005-2013, Rory Ye
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice,
+ *       this list of conditions and the following disclaimer in the documentation
+ *       and/or other materials provided with the distribution.
+ *     * Neither the name of the Jdkcn.com nor the names of its contributors may
+ *       be used to endorse or promote products derived from this software without
+ *       specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.jdkcn.jabber.web.listener;
-
-import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
-import static com.jdkcn.jabber.util.Constants.ROBOTS;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.annotation.WebListener;
-
-import com.jdkcn.jabber.web.servlet.*;
-import org.codehaus.jackson.JsonNode;
-import org.jivesoftware.smack.*;
-import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -38,6 +35,23 @@ import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.robot.RobotMessageListener;
 import com.jdkcn.jabber.util.JsonUtil;
 import com.jdkcn.jabber.web.filter.UserSigninFilter;
+import com.jdkcn.jabber.web.servlet.*;
+import org.codehaus.jackson.JsonNode;
+import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Presence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.annotation.WebListener;
+import java.io.IOException;
+import java.util.*;
+
+import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
+import static com.jdkcn.jabber.util.Constants.ROBOTS;
 
 /**
  * @author Rory
