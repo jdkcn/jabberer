@@ -31,18 +31,31 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * a user object.
  * User: rory
  * Date: 4/06/13
  * Time: 21:08
  */
-public class User implements Serializable{
+public class User implements Serializable {
 
+    /**
+     * generated serial version uid.
+     */
     private static final long serialVersionUID = 4372848711554418821L;
 
+    /**
+     * the username.
+     */
     private String username;
 
+    /**
+     * the password.
+     */
     private String password;
 
+    /**
+     * the user manage robot names.
+     */
     private List<String> manageRobots;
 
     public String getUsername() {

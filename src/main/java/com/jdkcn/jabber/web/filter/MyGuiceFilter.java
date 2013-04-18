@@ -27,13 +27,14 @@
  */
 package com.jdkcn.jabber.web.filter;
 
-import javax.servlet.annotation.WebFilter;
-
 import com.google.inject.servlet.GuiceFilter;
 
+import javax.servlet.annotation.WebFilter;
+
 /**
+ * Custom guice filter to setup guice web platform.
+ *
  * @author Rory
- * @date Feb 7, 2012
  * @version $Id$
  */
 @WebFilter(filterName = "Guice Filter", urlPatterns = {"/*"})

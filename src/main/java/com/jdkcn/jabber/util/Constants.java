@@ -28,31 +28,35 @@
 package com.jdkcn.jabber.util;
 
 /**
+ * constants for this project
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
  * @version $Id$
  */
 public final class Constants {
 
-	private Constants() {
-	}
-	
-	/**
-	 * The robots key in servlet context
-	 */
-	public static final String ROBOTS = "ROBOTS";
+    /**
+     * login user key in httpSession
+     */
+    public static final String LOGIN_USER = "LOGIN_USER";
 
-	/**
-	 * The jabberer json config
-	 */
-	public static final String JABBERERJSONCONFIG = "JABBERERJSONCONFIG";
+    /**
+     * The robots key in servlet context
+     */
+    public static final String ROBOTS = "ROBOTS";
 
-	/**
-	 * All of the jabber robot's connection
-	 */
-	public static final String XMPPCONNECTION_MAP = "XMPPCONNECTION_MAP";
-	
-	/**
-	 * login user key in httpSession
-	 */
-	public static final String LOGIN_USER = "LOGIN_USER";
+    /**
+     * The jabberer json config
+     */
+    public static final String JABBERERJSONCONFIG = "JABBERERJSONCONFIG";
+
+    /**
+     * All of the jabber robot's connection
+     */
+    public static final String XMPPCONNECTION_MAP = "XMPPCONNECTION_MAP";
+
+    /**
+     * prevent instance this class.
+     */
+    private Constants() {
+    }
 }

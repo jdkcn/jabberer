@@ -27,45 +27,46 @@
  */
 package com.jdkcn.jabber.robot;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
-
 /**
+ * the jabber robot.
  * @author Rory
- * @date Feb 8, 2012
  * @version $Id$
+ * @since Feb 8, 2012
  */
 public class Robot implements Serializable {
 
-	private static final long serialVersionUID = -8057823951538493009L;
+    private static final long serialVersionUID = -8057823951538493009L;
 
-	private String name;
+    private String name;
 
     private String username;
-	
-	private String password;
-	
-	private Date startTime;
-	
-	private Boolean sendOfflineMessage;
-	
-	private List<RosterEntry> rosters;
-	
-	private List<RosterEntry> onlineRosters;
-	
-	private List<RosterEntry> administrators;
-	
-	private List<String> administratorIds;
-	
-	private Status status;
-	
-	private XMPPConnection connection;
+
+    private String password;
+
+    private Date startTime;
+
+    private Boolean sendOfflineMessage;
+
+    private List<RosterEntry> rosters;
+
+    private List<RosterEntry> onlineRosters;
+
+    private List<RosterEntry> administrators;
+
+    private List<String> administratorIds;
+
+    private Status status;
+
+    private XMPPConnection connection;
 
     public String getUsername() {
         return username;
@@ -76,148 +77,153 @@ public class Robot implements Serializable {
     }
 
     public String getPassword() {
-		return password;
-	}
+        return password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public XMPPConnection getConnection() {
-		return connection;
-	}
+    public XMPPConnection getConnection() {
+        return connection;
+    }
 
-	public void setConnection(XMPPConnection connection) {
-		this.connection = connection;
-	}
+    public void setConnection(XMPPConnection connection) {
+        this.connection = connection;
+    }
 
-	public List<String> getAdministratorIds() {
-		if (administratorIds == null) {
-			administratorIds = new ArrayList<String>();
-		}
-		return administratorIds;
-	}
+    public List<String> getAdministratorIds() {
+        if (administratorIds == null) {
+            administratorIds = new ArrayList<String>();
+        }
+        return administratorIds;
+    }
 
-	public void setAdministratorIds(List<String> administratorIds) {
-		this.administratorIds = administratorIds;
-	}
+    public void setAdministratorIds(List<String> administratorIds) {
+        this.administratorIds = administratorIds;
+    }
 
-	public String getOnlineRosterNames() {
-		return parseRosterNames(getOnlineRosters(), false);
-	}
-	
-	public String getRosterNames() {
-		return parseRosterNames(getRosters(), false);
-	}
-	
-	public String getAdministratorNames() {
-		List<String> nameList = parseRosterNameList(getAdministrators(), true);
-		String names = StringUtils.join(nameList, ",");
-		for (String administratorId : getAdministratorIds()) {
-			if (names.indexOf(administratorId) == -1) {
-				nameList.add(administratorId);
-			}
-		}
-		return StringUtils.join(nameList, ",");
-	}
-	
-	/**
-	 * @param rosters
-	 * @param showUser
-	 * @return
-	 */
-	private String parseRosterNames(List<RosterEntry> rosters, boolean showUser) {
-		List<String> names = parseRosterNameList(rosters, showUser);
-		return StringUtils.join(names, "，");
-	}
-	
-	/**
-	 * @param rosters
-	 * @param showUser
-	 * @return
-	 */
-	private List<String> parseRosterNameList(List<RosterEntry> rosters, boolean showUser) {
-		List<String> names = new ArrayList<String>();
-		for (RosterEntry entry : rosters) {
-			String entryName = entry.getName();
-			if (StringUtils.isNotBlank(entryName)) {
-				if (showUser) {
-					entryName += "[" + entry.getUser() + "]";
-				}
-				names.add(entryName);
-			} else {
-				names.add(entry.getUser());
-			}
-		}
-		return names;
-	}
-	
-	public Boolean getSendOfflineMessage() {
-		return sendOfflineMessage;
-	}
+    public String getOnlineRosterNames() {
+        return parseRosterNames(getOnlineRosters(), false);
+    }
 
-	public void setSendOfflineMessage(Boolean sendOfflineMessage) {
-		this.sendOfflineMessage = sendOfflineMessage;
-	}
+    public String getRosterNames() {
+        return parseRosterNames(getRosters(), false);
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getAdministratorNames() {
+        List<String> nameList = parseRosterNameList(getAdministrators(), true);
+        String names = StringUtils.join(nameList, ",");
+        for (String administratorId : getAdministratorIds()) {
+            if (names.indexOf(administratorId) == -1) {
+                nameList.add(administratorId);
+            }
+        }
+        return StringUtils.join(nameList, ",");
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     * parse the roster names from RosterEntry list.
+     * @param rosters
+     * @param showUser
+     * @return
+     */
+    private String parseRosterNames(List<RosterEntry> rosters, boolean showUser) {
+        List<String> names = parseRosterNameList(rosters, showUser);
+        return StringUtils.join(names, "，");
+    }
 
-	public Date getStartTime() {
-		return startTime;
-	}
+    /**
+     * parse the roster name list from RosterEntry list.
+     * @param rosters
+     * @param showUser
+     * @return
+     */
+    private List<String> parseRosterNameList(List<RosterEntry> rosters, boolean showUser) {
+        List<String> names = new ArrayList<String>();
+        for (RosterEntry entry : rosters) {
+            String entryName = entry.getName();
+            if (StringUtils.isNotBlank(entryName)) {
+                if (showUser) {
+                    entryName += "[" + entry.getUser() + "]";
+                }
+                names.add(entryName);
+            } else {
+                names.add(entry.getUser());
+            }
+        }
+        return names;
+    }
 
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
+    public Boolean getSendOfflineMessage() {
+        return sendOfflineMessage;
+    }
 
-	public List<RosterEntry> getRosters() {
-		if (rosters == null) {
-			rosters = new ArrayList<RosterEntry>();
-		}
-		return rosters;
-	}
+    public void setSendOfflineMessage(Boolean sendOfflineMessage) {
+        this.sendOfflineMessage = sendOfflineMessage;
+    }
 
-	public void setRosters(List<RosterEntry> rosters) {
-		this.rosters = rosters;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public List<RosterEntry> getOnlineRosters() {
-		if (onlineRosters == null) {
-			onlineRosters = new ArrayList<RosterEntry>();
-		}
-		return onlineRosters;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setOnlineRosters(List<RosterEntry> onlineRosters) {
-		this.onlineRosters = onlineRosters;
-	}
+    public Date getStartTime() {
+        return startTime;
+    }
 
-	public List<RosterEntry> getAdministrators() {
-		if (administrators == null) {
-			administrators = new ArrayList<RosterEntry>();
-		}
-		return administrators;
-	}
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-	public void setAdministrators(List<RosterEntry> administrators) {
-		this.administrators = administrators;
-	}
+    public List<RosterEntry> getRosters() {
+        if (rosters == null) {
+            rosters = new ArrayList<RosterEntry>();
+        }
+        return rosters;
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public void setRosters(List<RosterEntry> rosters) {
+        this.rosters = rosters;
+    }
 
-	public void setStatus(Status status) {
-		this.status = status;
-	}
+    public List<RosterEntry> getOnlineRosters() {
+        if (onlineRosters == null) {
+            onlineRosters = new ArrayList<RosterEntry>();
+        }
+        return onlineRosters;
+    }
 
-	public static enum Status {
-		Online, Offline, LoginFailed
-	}
+    public void setOnlineRosters(List<RosterEntry> onlineRosters) {
+        this.onlineRosters = onlineRosters;
+    }
+
+    public List<RosterEntry> getAdministrators() {
+        if (administrators == null) {
+            administrators = new ArrayList<RosterEntry>();
+        }
+        return administrators;
+    }
+
+    public void setAdministrators(List<RosterEntry> administrators) {
+        this.administrators = administrators;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    /**
+     * robot status enum.
+     */
+    public static enum Status {
+        Online, Offline, LoginFailed
+    }
 }

@@ -28,7 +28,11 @@
 package com.jdkcn.jabber.robot;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.slf4j.Logger;
@@ -39,18 +43,42 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Robot message listener for xmpp message deal.
+ *
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
- * @since Mar 17, 2010 2:40:32 PM
- * @version $Id$
  */
 public class RobotMessageListener implements MessageListener {
 
+    /**
+     * THe constructor with robot and sendOfflineMessage.
+     * @param robot
+     * @param sendOfflineMessage
+     */
+    public RobotMessageListener(Robot robot, Boolean sendOfflineMessage) {
+        this.robot = robot;
+        if (sendOfflineMessage != null) {
+            this.sendOfflineMessage = sendOfflineMessage;
+        }
+    }
+
+    /**
+     *
+     */
     private final Logger logger = LoggerFactory.getLogger(RobotMessageListener.class);
 
+    /**
+     * The robot for this message listener.
+     */
     private Robot robot;
 
+    /**
+     * The send offline message or not.
+     */
     private boolean sendOfflineMessage = true;
 
+    /**
+     * The robot's command list.
+     */
     private static final List<String> commandList;
 
     static {
@@ -65,13 +93,6 @@ public class RobotMessageListener implements MessageListener {
         commandList.add("/add");
         commandList.add("/name");
         commandList.add("/remove");
-    }
-
-    public RobotMessageListener(Robot robot, Boolean sendOfflineMessage) {
-        this.robot = robot;
-        if (sendOfflineMessage != null) {
-            this.sendOfflineMessage = sendOfflineMessage;
-        }
     }
 
     /**
@@ -98,7 +119,8 @@ public class RobotMessageListener implements MessageListener {
             if (isCommand) {
                 processCommand(chat, body, sender);
             } else {
-                logger.info(StringUtils.center(" sending start ", 50, "#"));
+                int size = 50;
+                logger.info(StringUtils.center(" sending start ", size, "#"));
                 for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
                     if (entry.getUser().equalsIgnoreCase(sender)) {
                         continue;
@@ -117,7 +139,7 @@ public class RobotMessageListener implements MessageListener {
                         logger.error("send message to:" + entry.getUser(), e);
                     }
                 }
-                logger.info(StringUtils.center(" sent done ", 50, "#"));
+                logger.info(StringUtils.center(" sent done ", size, "#"));
             }
         }
     }
@@ -279,7 +301,7 @@ public class RobotMessageListener implements MessageListener {
 
     private String getRosterEntryNames(boolean onlineOnly, String separator) {
         StringBuffer sb = new StringBuffer();
-        for(RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
+        for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
             if (onlineOnly) {
                 Presence presence = robot.getConnection().getRoster().getPresence(entry.getUser());
                 if (!presence.isAvailable()) {
