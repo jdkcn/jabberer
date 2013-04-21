@@ -6,5 +6,5 @@
 
 ## Management
 
-![The jabberer screen shot](http://farm8.staticflickr.com/7243/7210005720_c7a8b5c3f8_o.png "Screenshot")
+![The jabberer screen shot](http://farm9.staticflickr.com/8538/8668022862_f79afe121f_b.jpg "Screenshot")
 
