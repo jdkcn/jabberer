@@ -41,13 +41,17 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * The disconnect servlet.
  * @author Rory
  * @version $Id$
- * @date Feb 8, 2012
+ * Time Feb 8, 2012
  */
 @Singleton
 public class DisconnectServlet extends HttpServlet {
 
+    /**
+     * The serial version uid.
+     */
     private static final long serialVersionUID = 62363420741659852L;
 
     /**

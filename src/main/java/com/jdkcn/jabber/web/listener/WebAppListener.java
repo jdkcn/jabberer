@@ -74,37 +74,30 @@ import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
 import static com.jdkcn.jabber.util.Constants.ROBOTS;
 
 /**
+ * The webapp listener for robot startup.
+ *
  * @author Rory
  * @version $Id$
- * @date Feb 7, 2012
+ *          Time Feb 7, 2012
  */
 @WebListener
 public class WebAppListener extends GuiceServletContextListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebAppListener.class);
-
+    /**
+     * The slf4j logger.
+     */
+    private static Logger logger = LoggerFactory.getLogger(WebAppListener.class);
+    /**
+     * All the robots.
+     */
     private List<Robot> robots = new ArrayList<Robot>();
 
     /**
-     * {@inheritDoc}
+     * connec the robot.
+     *
+     * @param robotNode the robot's json config.
+     * @return the robot.
      */
-    @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
-        super.contextInitialized(servletContextEvent);
-        try {
-            JsonNode jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
-            servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
-            List<Robot> robots = new ArrayList<Robot>();
-            for (JsonNode robotNode : jsonConfig.get("robots")) {
-                Robot robot = connect(robotNode);
-                robots.add(robot);
-            }
-            servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static Robot connect(JsonNode robotNode) {
         String username = robotNode.get("username").asText();
         Robot robot = new Robot();
@@ -162,10 +155,11 @@ public class WebAppListener extends GuiceServletContextListener {
         return robot;
     }
 
-
     /**
-     * @param robot
-     * @param robotNode
+     * find the administrators and set to robot.
+     *
+     * @param robot     the robot.
+     * @param robotNode the robot's json config.
      */
     private static void findAdministrators(Robot robot, JsonNode robotNode) {
         List<String> administrators = new ArrayList<String>();
@@ -180,6 +174,25 @@ public class WebAppListener extends GuiceServletContextListener {
             }
         }
         robot.setAdministratorIds(administrators);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
+        super.contextInitialized(servletContextEvent);
+        try {
+            JsonNode jsonConfig = JsonUtil.fromJson(WebAppListener.class.getResourceAsStream("/config.json"), JsonNode.class);
+            servletContextEvent.getServletContext().setAttribute(JABBERERJSONCONFIG, jsonConfig);
+            for (JsonNode robotNode : jsonConfig.get("robots")) {
+                Robot robot = connect(robotNode);
+                robots.add(robot);
+            }
+            servletContextEvent.getServletContext().setAttribute(ROBOTS, robots);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -225,10 +238,21 @@ public class WebAppListener extends GuiceServletContextListener {
      */
     private static class SubscriptionListener implements PacketListener {
 
+        /**
+         * The roster.
+         */
         private Roster roster;
-
+        /**
+         * The xmpp connection.
+         */
         private Connection connection;
 
+        /**
+         * Constructor with roster and connection.
+         *
+         * @param roster     the roster.
+         * @param connection the xmpp connection.
+         */
         public SubscriptionListener(Roster roster, Connection connection) {
             this.roster = roster;
             this.connection = connection;

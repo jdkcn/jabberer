@@ -44,16 +44,24 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * The reconnect servlet.
+ *
  * @author Rory
  * @version $Id$
- * @date Feb 8, 2012
+ * Time Feb 8, 2012
  */
 @Singleton
 public class ReconnectServlet extends HttpServlet {
 
-    private final Logger logger = LoggerFactory.getLogger(ReconnectServlet.class);
-
+    /**
+     * The serial version uid.
+     */
     private static final long serialVersionUID = 9193217606790233091L;
+
+    /**
+     * The slf4j logger.
+     */
+    private final Logger logger = LoggerFactory.getLogger(ReconnectServlet.class);
 
     /**
      * {@inheritDoc}

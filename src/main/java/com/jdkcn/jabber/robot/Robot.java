@@ -38,34 +38,60 @@ import java.util.List;
 
 /**
  * the jabber robot.
+ *
  * @author Rory
  * @version $Id$
  * @since Feb 8, 2012
  */
 public class Robot implements Serializable {
 
+    /**
+     * The serial version uid.
+     */
     private static final long serialVersionUID = -8057823951538493009L;
-
+    /**
+     * The robot name.
+     */
     private String name;
-
+    /**
+     * The robot's username for login.
+     */
     private String username;
-
+    /**
+     * The robot's password for login.
+     */
     private String password;
-
+    /**
+     * The robot's start time.
+     */
     private Date startTime;
-
+    /**
+     * Whether send offline message.
+     */
     private Boolean sendOfflineMessage;
-
+    /**
+     * The robot's roster entries.
+     */
     private List<RosterEntry> rosters;
-
+    /**
+     * The robot's online roster entries.
+     */
     private List<RosterEntry> onlineRosters;
-
+    /**
+     * The robot's administrators for command management.
+     */
     private List<RosterEntry> administrators;
-
+    /**
+     * The administrator's ids.
+     */
     private List<String> administratorIds;
-
+    /**
+     * The robot's status.
+     */
     private Status status;
-
+    /**
+     * THe xmpp connection.
+     */
     private XMPPConnection connection;
 
     public String getUsername() {
@@ -92,6 +118,11 @@ public class Robot implements Serializable {
         this.connection = connection;
     }
 
+    /**
+     * Get administrator's ids.
+     *
+     * @return administrator ids or empty list.
+     */
     public List<String> getAdministratorIds() {
         if (administratorIds == null) {
             administratorIds = new ArrayList<String>();
@@ -111,6 +142,11 @@ public class Robot implements Serializable {
         return parseRosterNames(getRosters(), false);
     }
 
+    /**
+     * Get the administrator's names.
+     *
+     * @return the administrator names join with comma.
+     */
     public String getAdministratorNames() {
         List<String> nameList = parseRosterNameList(getAdministrators(), true);
         String names = StringUtils.join(nameList, ",");
@@ -124,9 +160,10 @@ public class Robot implements Serializable {
 
     /**
      * parse the roster names from RosterEntry list.
-     * @param rosters
-     * @param showUser
-     * @return
+     *
+     * @param rosters  the roster entry list
+     * @param showUser show roster entry's user or not
+     * @return return roster's names join with comma.
      */
     private String parseRosterNames(List<RosterEntry> rosters, boolean showUser) {
         List<String> names = parseRosterNameList(rosters, showUser);
@@ -135,9 +172,10 @@ public class Robot implements Serializable {
 
     /**
      * parse the roster name list from RosterEntry list.
-     * @param rosters
-     * @param showUser
-     * @return
+     *
+     * @param rosters  the roster entry list
+     * @param showUser show roster entry's user or not
+     * @return return roster's name list.
      */
     private List<String> parseRosterNameList(List<RosterEntry> rosters, boolean showUser) {
         List<String> names = new ArrayList<String>();
@@ -179,6 +217,11 @@ public class Robot implements Serializable {
         this.startTime = startTime;
     }
 
+    /**
+     * Get the roster entry list
+     *
+     * @return roster entry list or empty list.
+     */
     public List<RosterEntry> getRosters() {
         if (rosters == null) {
             rosters = new ArrayList<RosterEntry>();
@@ -190,6 +233,11 @@ public class Robot implements Serializable {
         this.rosters = rosters;
     }
 
+    /**
+     * Get the online roster entry list
+     *
+     * @return online roster entry list or empty list.
+     */
     public List<RosterEntry> getOnlineRosters() {
         if (onlineRosters == null) {
             onlineRosters = new ArrayList<RosterEntry>();
@@ -201,6 +249,11 @@ public class Robot implements Serializable {
         this.onlineRosters = onlineRosters;
     }
 
+    /**
+     * Get the administrator roster entry list.
+     *
+     * @return administrator roster entry list or empty list.
+     */
     public List<RosterEntry> getAdministrators() {
         if (administrators == null) {
             administrators = new ArrayList<RosterEntry>();
@@ -224,6 +277,17 @@ public class Robot implements Serializable {
      * robot status enum.
      */
     public static enum Status {
-        Online, Offline, LoginFailed
+        /**
+         * The online status.
+         */
+        Online,
+        /**
+         * THe offline status.
+         */
+        Offline,
+        /**
+         * The login field status.
+         */
+        LoginFailed
     }
 }

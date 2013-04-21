@@ -28,12 +28,9 @@
 package com.jdkcn.jabber.util;
 
 import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
@@ -45,14 +42,16 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 
 /**
+ * The json utility.
+ *
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
  * @version $Id$
  */
-public class JsonUtil {
+public final class JsonUtil {
 
-    private JsonUtil() {
-    }
-
+    /**
+     * the jackson's object mapper.
+     */
     private static ObjectMapper m;
 
     static {
@@ -61,38 +60,71 @@ public class JsonUtil {
         m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
     }
 
-
     private static JsonFactory jf = new JsonFactory();
 
-    public static <T> T fromJson(String jsonAsString, Class<T> pojoClass) throws JsonMappingException, JsonParseException, IOException {
+
+    /**
+     * The private constructor for non instance this class.
+     */
+    private JsonUtil() {
+    }
+
+    /**
+     * deserializer the json string to object.
+     *
+     * @param jsonAsString the json string.
+     * @param pojoClass    the object java class.
+     * @param <T>          the object's generic type.
+     * @return deserializer java object
+     * @throws IOException
+     */
+    public static <T> T fromJson(String jsonAsString, Class<T> pojoClass) throws IOException {
         return m.readValue(jsonAsString, pojoClass);
     }
 
-    public static <T> T fromJson(String jsonAsString, TypeReference<T> valueTypeRef) throws JsonMappingException, JsonParseException, IOException {
+    /**
+     * deserializer the json string to object.
+     *
+     * @param jsonAsString the json string.
+     * @param valueTypeRef full generics type.
+     * @param <T>          the object's generic type.
+     * @return deserializer java object
+     * @throws IOException
+     */
+    public static <T> T fromJson(String jsonAsString, TypeReference<T> valueTypeRef) throws IOException {
         return m.readValue(jsonAsString, valueTypeRef);
     }
 
-    public static <T> T fromJson(FileReader fr, Class<T> pojoClass) throws JsonParseException, IOException {
+    /**
+     * deserializer the json file to object.
+     *
+     * @param fr        the file reader.
+     * @param pojoClass the object java class.
+     * @param <T>       the object's generic type.
+     * @return deserializer java object.
+     * @throws IOException
+     */
+    public static <T> T fromJson(FileReader fr, Class<T> pojoClass) throws IOException {
         return m.readValue(fr, pojoClass);
     }
 
-    public static <T> T fromJson(FileReader fr, TypeReference<T> valueTypeRef) throws JsonParseException, IOException {
+    public static <T> T fromJson(FileReader fr, TypeReference<T> valueTypeRef) throws IOException {
         return m.readValue(fr, valueTypeRef);
     }
 
-    public static <T> T fromJson(InputStream is, Class<T> pojoClass) throws JsonParseException, IOException {
+    public static <T> T fromJson(InputStream is, Class<T> pojoClass) throws IOException {
         return m.readValue(is, pojoClass);
     }
 
-    public static <T> T fromJson(InputStream is, TypeReference<T> valueTypeRef) throws JsonParseException, IOException {
+    public static <T> T fromJson(InputStream is, TypeReference<T> valueTypeRef) throws IOException {
         return m.readValue(is, valueTypeRef);
     }
 
-    public static <T> T fromJson(JsonNode root, Class<T> valueType) throws JsonParseException, IOException {
+    public static <T> T fromJson(JsonNode root, Class<T> valueType) throws IOException {
         return m.readValue(root, valueType);
     }
 
-    public static String toJson(Object pojo, boolean prettyPrint) throws JsonMappingException, JsonGenerationException, IOException {
+    public static String toJson(Object pojo, boolean prettyPrint) throws IOException {
         StringWriter sw = new StringWriter();
         JsonGenerator jg = jf.createJsonGenerator(sw);
         if (prettyPrint) {
@@ -102,7 +134,7 @@ public class JsonUtil {
         return sw.toString();
     }
 
-    public static void toJson(Object pojo, FileWriter fw, boolean prettyPrint) throws JsonMappingException, JsonGenerationException, IOException {
+    public static void toJson(Object pojo, FileWriter fw, boolean prettyPrint) throws IOException {
         JsonGenerator jg = jf.createJsonGenerator(fw);
         if (prettyPrint) {
             jg.useDefaultPrettyPrinter();

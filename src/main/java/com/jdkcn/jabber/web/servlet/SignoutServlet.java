@@ -37,15 +37,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * The user sign out Servlet
+ *
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
  * @version $Id$
  */
 @Singleton
-public class
-        SignoutServlet extends HttpServlet {
+public class SignoutServlet extends HttpServlet {
 
     /**
-     *
+     * The serial version uid.
      */
     private static final long serialVersionUID = -7157895059055890646L;
 

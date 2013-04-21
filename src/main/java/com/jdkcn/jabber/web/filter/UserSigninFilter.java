@@ -30,13 +30,20 @@ package com.jdkcn.jabber.web.filter;
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.util.Constants;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
+ * The user signin filter.
+ *
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
  * @version $Id$
  */

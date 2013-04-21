@@ -50,49 +50,48 @@ import java.util.List;
 public class RobotMessageListener implements MessageListener {
 
     /**
-     * THe constructor with robot and sendOfflineMessage.
-     * @param robot
-     * @param sendOfflineMessage
+     * The robot's command list.
      */
-    public RobotMessageListener(Robot robot, Boolean sendOfflineMessage) {
-        this.robot = robot;
-        if (sendOfflineMessage != null) {
-            this.sendOfflineMessage = sendOfflineMessage;
-        }
+    private static final List<String> COMMAND_LIST;
+
+    static {
+        COMMAND_LIST = new ArrayList<String>();
+        COMMAND_LIST.add("/help");
+        COMMAND_LIST.add("/h");
+        COMMAND_LIST.add("/?");
+        COMMAND_LIST.add("/list");
+        COMMAND_LIST.add("/l");
+        COMMAND_LIST.add("/online");
+        COMMAND_LIST.add("/o");
+        COMMAND_LIST.add("/add");
+        COMMAND_LIST.add("/name");
+        COMMAND_LIST.add("/remove");
     }
 
     /**
-     *
+     * The slf4j logger.
      */
     private final Logger logger = LoggerFactory.getLogger(RobotMessageListener.class);
-
     /**
      * The robot for this message listener.
      */
     private Robot robot;
-
     /**
      * The send offline message or not.
      */
     private boolean sendOfflineMessage = true;
 
     /**
-     * The robot's command list.
+     * THe constructor with robot and sendOfflineMessage.
+     *
+     * @param robot              the robot
+     * @param sendOfflineMessage whether send offline message or not
      */
-    private static final List<String> commandList;
-
-    static {
-        commandList = new ArrayList<String>();
-        commandList.add("/help");
-        commandList.add("/h");
-        commandList.add("/?");
-        commandList.add("/list");
-        commandList.add("/l");
-        commandList.add("/online");
-        commandList.add("/o");
-        commandList.add("/add");
-        commandList.add("/name");
-        commandList.add("/remove");
+    public RobotMessageListener(Robot robot, Boolean sendOfflineMessage) {
+        this.robot = robot;
+        if (sendOfflineMessage != null) {
+            this.sendOfflineMessage = sendOfflineMessage;
+        }
     }
 
     /**
@@ -110,7 +109,7 @@ public class RobotMessageListener implements MessageListener {
         String sender = name + "@" + server;
         if (message.getType() == Message.Type.chat && StringUtils.isNotBlank(body)) {
             boolean isCommand = false;
-            for (String command : commandList) {
+            for (String command : COMMAND_LIST) {
                 if (body.toLowerCase().startsWith(command)) {
                     isCommand = true;
                     break;
@@ -119,35 +118,48 @@ public class RobotMessageListener implements MessageListener {
             if (isCommand) {
                 processCommand(chat, body, sender);
             } else {
-                int size = 50;
-                logger.info(StringUtils.center(" sending start ", size, "#"));
-                for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
-                    if (entry.getUser().equalsIgnoreCase(sender)) {
-                        continue;
-                    }
-                    Presence presence = robot.getConnection().getRoster().getPresence(entry.getUser());
-                    if (!sendOfflineMessage && !presence.isAvailable()) {
-                        continue;
-                    }
-                    logger.info("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
-                    Message msg = new Message(entry.getUser(), Message.Type.chat);
-                    msg.setBody("<" + findPosterName(sender, name) + "> " + body);
-                    try {
-//						final MessageListener messageListener = new RobotMessageListener(connection, roster, rosterEntries, sendOfflineMessage, robot);
-                        robot.getConnection().getChatManager().createChat(entry.getUser(), this).sendMessage(msg);
-                    } catch (XMPPException e) {
-                        logger.error("send message to:" + entry.getUser(), e);
-                    }
-                }
-                logger.info(StringUtils.center(" sent done ", size, "#"));
+                sendMessage(body, name, sender);
             }
         }
     }
 
     /**
-     * @param sender
-     * @param name
-     * @return
+     * send the message to all other roster entry.
+     *
+     * @param body   the message body.
+     * @param name   the sender name.
+     * @param sender the sender.
+     */
+    private void sendMessage(String body, String name, String sender) {
+        final int size = 50;
+        logger.info(StringUtils.center(" sending start ", size, "#"));
+        for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
+            if (entry.getUser().equalsIgnoreCase(sender)) {
+                continue;
+            }
+            Presence presence = robot.getConnection().getRoster().getPresence(entry.getUser());
+            if (!sendOfflineMessage && !presence.isAvailable()) {
+                continue;
+            }
+            logger.info("sending to :" + entry.getUser() + "[" + entry.getName() + "]");
+            Message msg = new Message(entry.getUser(), Message.Type.chat);
+            msg.setBody("<" + findPosterName(sender, name) + "> " + body);
+            try {
+//						final MessageListener messageListener = new RobotMessageListener(connection, roster, rosterEntries, sendOfflineMessage, robot);
+                robot.getConnection().getChatManager().createChat(entry.getUser(), this).sendMessage(msg);
+            } catch (XMPPException e) {
+                logger.error("send message to:" + entry.getUser(), e);
+            }
+        }
+        logger.info(StringUtils.center(" sent done ", size, "#"));
+    }
+
+    /**
+     * find the postername.
+     *
+     * @param sender the sender.
+     * @param name   the roster entry's name
+     * @return the roster's name or just return the passed name
      */
     private String findPosterName(String sender, String name) {
         for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
@@ -160,6 +172,13 @@ public class RobotMessageListener implements MessageListener {
         return name;
     }
 
+    /**
+     * Process the commands.
+     *
+     * @param chat    the xmpp chat.
+     * @param command the command.
+     * @param sender  the sender.
+     */
     private void processCommand(Chat chat, String command, String sender) {
         if ("/l".equalsIgnoreCase(command) || "/list".equalsIgnoreCase(command)) {
             Message message = new Message(sender, Message.Type.chat);
@@ -194,96 +213,131 @@ public class RobotMessageListener implements MessageListener {
                 e.printStackTrace();
             }
         } else if (command.startsWith("/add")) {
-            if (robot.getAdministratorNames().indexOf(sender) == -1) {
-                sendNoPermissionMessage(chat, sender);
-            } else {
-                String[] args = StringUtils.split(command.substring(4), " ");
-                if (args == null || args.length == 0) {
-                    Message message = new Message(sender, Message.Type.chat);
-                    message.setBody("\n args wrong please use:\n \t /add <account> <nickname> [groupname]...");
-                    try {
-                        chat.sendMessage(message);
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        String nickname = null;
-                        if (args.length > 1) {
-                            nickname = args[1].trim();
-                        }
-                        String[] groups = null;
-                        if (args.length > 2) {
-                            groups = Arrays.copyOfRange(args, 2, args.length);
-                        }
-                        Roster roster = robot.getConnection().getRoster();
-                        roster.createEntry(args[0].trim(), nickname, groups);
-                        robot.getRosters().clear();
-                        robot.getRosters().addAll(roster.getEntries());
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            processAddCommand(chat, command, sender);
         } else if (command.startsWith("/name")) {
-            if (robot.getAdministratorNames().indexOf(sender) == -1) {
-                sendNoPermissionMessage(chat, sender);
+            processNameCommand(chat, command, sender);
+        } else if (command.startsWith("/remove")) {
+            processRemoveCommand(chat, command, sender);
+        }
+    }
+
+    /**
+     * Process the remove command.
+     *
+     * @param chat    the xmpp chat.
+     * @param command the command.
+     * @param sender  the sender.
+     */
+    private void processRemoveCommand(Chat chat, String command, String sender) {
+        if (robot.getAdministratorNames().indexOf(sender) == -1) {
+            sendNoPermissionMessage(chat, sender);
+        } else {
+            String[] args = StringUtils.split(command.substring(7), " ");
+            if (args == null || args.length < 1) {
+                Message message = new Message(sender, Message.Type.chat);
+                message.setBody("\n args wrong please use:\n \t /remove <account>");
+                try {
+                    chat.sendMessage(message);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
             } else {
-                String[] args = StringUtils.split(command.substring(5), " ");
-                if (args == null || args.length < 2) {
-                    Message message = new Message(sender, Message.Type.chat);
-                    message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
-                    try {
-                        chat.sendMessage(message);
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    }
-                } else {
+                try {
                     Roster roster = robot.getConnection().getRoster();
-                    RosterEntry rosterEntry = roster.getEntry(args[0].trim());
+                    RosterEntry rosterEntry = roster.getEntry(args[0]);
                     if (rosterEntry != null) {
-                        rosterEntry.setName(args[1]);
+                        roster.removeEntry(rosterEntry);
+                        Presence presence = new Presence(Presence.Type.unsubscribe);
+                        presence.setTo(rosterEntry.getUser());
+                        robot.getConnection().sendPacket(presence);
                     }
                     robot.getRosters().clear();
                     robot.getRosters().addAll(roster.getEntries());
-                }
-            }
-        } else if (command.startsWith("/remove")) {
-            if (robot.getAdministratorNames().indexOf(sender) == -1) {
-                sendNoPermissionMessage(chat, sender);
-            } else {
-                String[] args = StringUtils.split(command.substring(7), " ");
-                if (args == null || args.length < 1) {
-                    Message message = new Message(sender, Message.Type.chat);
-                    message.setBody("\n args wrong please use:\n \t /remove <account>");
-                    try {
-                        chat.sendMessage(message);
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        Roster roster = robot.getConnection().getRoster();
-                        RosterEntry rosterEntry = roster.getEntry(args[0]);
-                        if (rosterEntry != null) {
-                            roster.removeEntry(rosterEntry);
-                            Presence presence = new Presence(Presence.Type.unsubscribe);
-                            presence.setTo(rosterEntry.getUser());
-                            robot.getConnection().sendPacket(presence);
-                        }
-                        robot.getRosters().clear();
-                        robot.getRosters().addAll(roster.getEntries());
-                    } catch (XMPPException e) {
-                        e.printStackTrace();
-                    }
+                } catch (XMPPException e) {
+                    e.printStackTrace();
                 }
             }
         }
     }
 
     /**
-     * @param chat
-     * @param sender
+     * process the name command.
+     *
+     * @param chat    the xmpp chat.
+     * @param command the command.
+     * @param sender  the sender.
+     */
+    private void processNameCommand(Chat chat, String command, String sender) {
+        if (robot.getAdministratorNames().indexOf(sender) == -1) {
+            sendNoPermissionMessage(chat, sender);
+        } else {
+            String[] args = StringUtils.split(command.substring(5), " ");
+            if (args == null || args.length < 2) {
+                Message message = new Message(sender, Message.Type.chat);
+                message.setBody("\n args wrong please use:\n \t /name <account> <nickname>");
+                try {
+                    chat.sendMessage(message);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Roster roster = robot.getConnection().getRoster();
+                RosterEntry rosterEntry = roster.getEntry(args[0].trim());
+                if (rosterEntry != null) {
+                    rosterEntry.setName(args[1]);
+                }
+                robot.getRosters().clear();
+                robot.getRosters().addAll(roster.getEntries());
+            }
+        }
+    }
+
+    /**
+     * process the add command.
+     *
+     * @param chat    the xmpp chat.
+     * @param command the command.
+     * @param sender  the sender.
+     */
+    private void processAddCommand(Chat chat, String command, String sender) {
+        if (robot.getAdministratorNames().indexOf(sender) == -1) {
+            sendNoPermissionMessage(chat, sender);
+        } else {
+            String[] args = StringUtils.split(command.substring(4), " ");
+            if (args == null || args.length == 0) {
+                Message message = new Message(sender, Message.Type.chat);
+                message.setBody("\n args wrong please use:\n \t /add <account> <nickname> [groupname]...");
+                try {
+                    chat.sendMessage(message);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    String nickname = null;
+                    if (args.length > 1) {
+                        nickname = args[1].trim();
+                    }
+                    String[] groups = null;
+                    if (args.length > 2) {
+                        groups = Arrays.copyOfRange(args, 2, args.length);
+                    }
+                    Roster roster = robot.getConnection().getRoster();
+                    roster.createEntry(args[0].trim(), nickname, groups);
+                    robot.getRosters().clear();
+                    robot.getRosters().addAll(roster.getEntries());
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Send the no permission message.
+     *
+     * @param chat   the xmpp chat.
+     * @param sender the sender.
      */
     private void sendNoPermissionMessage(Chat chat, String sender) {
         Message message = new Message(sender, Message.Type.chat);
@@ -295,10 +349,23 @@ public class RobotMessageListener implements MessageListener {
         }
     }
 
+    /**
+     * Get the roster entry name string with {@code separator}.
+     *
+     * @param separator the separator
+     * @return the roster entry name string with specify separator.
+     */
     private String getRosterEntryNames(String separator) {
         return getRosterEntryNames(false, separator);
     }
 
+    /**
+     * Get the roster entry name string with {@code separator}.
+     *
+     * @param onlineOnly show online only.
+     * @param separator  the separator
+     * @return the roster entry name string with sepcify sepatator.
+     */
     private String getRosterEntryNames(boolean onlineOnly, String separator) {
         StringBuffer sb = new StringBuffer();
         for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {

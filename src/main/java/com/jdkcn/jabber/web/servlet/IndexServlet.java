@@ -45,13 +45,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The index servlet.
  * @author Rory
  * @version $Id$
- * @date Feb 7, 2012
+ * Time Feb 7, 2012
  */
 @Singleton
 public class IndexServlet extends HttpServlet {
 
+    /**
+     * The serial version uid.
+     */
     private static final long serialVersionUID = -4585928956316091202L;
 
     /**

@@ -44,14 +44,21 @@ import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
 import static com.jdkcn.jabber.util.Constants.LOGIN_USER;
 
 /**
+ * The user sign in servlet.
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
  * @version $Id$
  */
 @Singleton
 public class SigninServlet extends HttpServlet {
 
+    /**
+     * The serial version uid.
+     */
     private static final long serialVersionUID = -1108987102277577612L;
 
+    /**
+     * The administrator users.
+     */
     private List<User> users = new ArrayList<User>();
 
     @Override
