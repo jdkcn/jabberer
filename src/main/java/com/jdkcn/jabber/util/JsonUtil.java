@@ -60,6 +60,9 @@ public final class JsonUtil {
         m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
     }
 
+    /**
+     * The json factory.
+     */
     private static JsonFactory jf = new JsonFactory();
 
 
@@ -108,22 +111,65 @@ public final class JsonUtil {
         return m.readValue(fr, pojoClass);
     }
 
+    /**
+     * deserializer the json file to object.
+     *
+     * @param fr           the file reader
+     * @param valueTypeRef full generics type.
+     * @param <T>          the object's generic type.
+     * @return deserializer java object
+     */
     public static <T> T fromJson(FileReader fr, TypeReference<T> valueTypeRef) throws IOException {
         return m.readValue(fr, valueTypeRef);
     }
 
+    /**
+     * deserializer the json file to object.
+     *
+     * @param is        the input stream.
+     * @param pojoClass the object java class.
+     * @param <T>       the object's generic type.
+     * @return deserializer java object.
+     * @throws IOException
+     */
     public static <T> T fromJson(InputStream is, Class<T> pojoClass) throws IOException {
         return m.readValue(is, pojoClass);
     }
 
+    /**
+     * deserializer the json file to object.
+     *
+     * @param is           the input stream.
+     * @param valueTypeRef full generics type.
+     * @param <T> full generics type.
+     * @return deserializer the json file to object.
+     * @throws IOException
+     */
     public static <T> T fromJson(InputStream is, TypeReference<T> valueTypeRef) throws IOException {
         return m.readValue(is, valueTypeRef);
     }
 
+    /**
+     * deserializer the json object to object.
+     *
+     * @param root      the json object.
+     * @param valueType the object java class.
+     * @param <T>       full generics type.
+     * @return deserializer the json file to object.
+     * @throws IOException
+     */
     public static <T> T fromJson(JsonNode root, Class<T> valueType) throws IOException {
         return m.readValue(root, valueType);
     }
 
+    /**
+     * serialize the java object into json string.
+     *
+     * @param pojo        the java object.
+     * @param prettyPrint pretty print or not.
+     * @return the json string
+     * @throws IOException
+     */
     public static String toJson(Object pojo, boolean prettyPrint) throws IOException {
         StringWriter sw = new StringWriter();
         JsonGenerator jg = jf.createJsonGenerator(sw);
@@ -134,6 +180,14 @@ public final class JsonUtil {
         return sw.toString();
     }
 
+    /**
+     * serialize the java object into json file.
+     *
+     * @param pojo        the java object.
+     * @param fw          the file writer.
+     * @param prettyPrint pretty print or not.
+     * @throws IOException
+     */
     public static void toJson(Object pojo, FileWriter fw, boolean prettyPrint) throws IOException {
         JsonGenerator jg = jf.createJsonGenerator(fw);
         if (prettyPrint) {
