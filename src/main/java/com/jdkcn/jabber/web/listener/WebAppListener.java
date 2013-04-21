@@ -67,7 +67,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import static com.jdkcn.jabber.util.Constants.JABBERERJSONCONFIG;
@@ -164,8 +163,7 @@ public class WebAppListener extends GuiceServletContextListener {
     private static void findAdministrators(Robot robot, JsonNode robotNode) {
         List<String> administrators = new ArrayList<String>();
         robot.getAdministrators().clear();
-        for (Iterator<JsonNode> iterator = robotNode.get("administrators").iterator(); iterator.hasNext(); ) {
-            JsonNode node = iterator.next();
+        for (JsonNode node : robotNode.get("administrators")) {
             administrators.add(node.asText());
         }
         for (RosterEntry entry : robot.getRosters()) {
