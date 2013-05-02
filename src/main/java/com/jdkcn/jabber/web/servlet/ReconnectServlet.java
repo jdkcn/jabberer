@@ -29,8 +29,8 @@ package com.jdkcn.jabber.web.servlet;
 
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.robot.Robot;
+import com.jdkcn.jabber.robot.RobotConnector;
 import com.jdkcn.jabber.util.Constants;
-import com.jdkcn.jabber.web.listener.WebAppListener;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class ReconnectServlet extends HttpServlet {
                 JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(Constants.JABBERERJSONCONFIG);
                 for (JsonNode node : jsonConfig.get("robots")) {
                     if (node.get("name").asText().equalsIgnoreCase(robotName)) {
-                        reconnectRobot = WebAppListener.connect(node);
+                        reconnectRobot = RobotConnector.connect(node);
                     }
                 }
             } catch (Exception e) {
