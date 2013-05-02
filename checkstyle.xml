@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+    
+    <module name="TreeWalker">
+		<!--============================================================ -->
+        <!--javadoc检查-->
+        <!--============================================================ -->
+        <!--检查interface、class的javadoc，默认不检查author、version tags -->
+        <module name="JavadocType"/>
+		<!--检查构造函数、方法的javadoc，可以不声明RuntimeException-->
+        <module name="JavadocMethod">
+            <property name="allowUndeclaredRTE" value="true"/>
+            <property name="allowMissingThrowsTags" value="true"/>
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+			<property name="severity" value="warning"/>
+        </module>
+        <!--检查变量的javadoc -->
+        <module name="JavadocVariable">
+			<property name="severity" value="warning"/>
+		</module>
+        <!--检查javadoc的格式-->
+        <module name="JavadocStyle">
+			<property name="checkFirstSentence" value="false"/>
+			<property name="checkEmptyJavadoc" value="true"/>
+		</module>
+
+
+        <!--============================================================ -->
+        <!--命名检查-->
+        <!--============================================================ -->
+        <!--检查包名-->
+        <module name="PackageName"/>
+		<!--检查抽象类名-->
+        <module name="AbstractClassName">
+			<property name="ignoreName" value="true"/>
+			<property name="ignoreModifier" value="true"/>
+		</module>
+        <!--检查class、interface名 -->
+        <module name="TypeName"/>
+        <!--检查非静态变量 -->
+        <module name="MemberName"/>
+        <!--检查方法名 -->
+        <module name="MethodName"/>
+        <!--检查方法的参数名 -->
+        <module name="ParameterName"/>
+        <!--检查常量名 -->
+        <module name="ConstantName"/>
+        <!--检查静态变量名 -->
+        <module name="StaticVariableName"/>
+        <!--检查局部的final类型变量名，包括catch的参数-->
+        <module name="LocalFinalVariableName"/>
+        <!--检查局部的非final类型的变量名，包括catch的参数-->
+        <module name="LocalVariableName"/>
+        
+        <!--============================================================ -->
+        <!--引入检查-->
+        <!--============================================================ -->
+		<!--检查是否导入类得完整路径-->
+		<module name="AvoidStarImport"/>
+        <!--检查是否有未使用的import-->
+        <module name="UnusedImports"/>
+		<!--检查是否导入了不必显示导入的类-->
+		<module name="RedundantImport"/>
+        
+        <!--============================================================ -->
+        <!--长度检查-->
+        <!--============================================================ -->
+        <!--检查每行长度，不超过180个字，注释和标签跳过-->
+        <module name="LineLength">
+            <property name="max" value="180"/>
+			<property name="ignorePattern" value="^\s*[@\*]\s*[^\s]+.+$"/>
+        </module>
+        <!--检查构造函数、方法长度，不超过100行 -->
+        <module name="MethodLength">
+            <property name="max" value="100"/>
+        </module>
+        <!--检查构造函数、方法的参数个数，不超过8个 -->
+        <module name="ParameterNumber">
+            <property name="max" value="8"/>
+        </module>
+        <!--检查匿名内部类的长度。默认为100-->
+        <module name="AnonInnerLength">
+            <property name="max" value="100"/>
+        </module>
+        
+        <!--============================================================ -->
+        <!--修饰符-->
+        <!--============================================================ -->
+        <!--检查接口、annotation中是否有重复的修饰符-->
+        <module name="RedundantModifier"/>
+        <!--检查修饰符的顺序是否遵照java语言规范-->
+        <module name="ModifierOrder"/>
+        
+        <!--============================================================ -->
+        <!--区域检查-->
+        <!--============================================================ -->
+        <!--检查空的代码块-->
+        <module name="EmptyBlock"/>
+        <!--检查是否需要大括号。主要是在if，else时的情况 -->
+        <module name="NeedBraces"/>
+        <!--检查不需要的嵌套’{}’-->
+        <module name="AvoidNestedBlocks">
+            <property name="allowInSwitchCase" value="true"/>
+        </module>
+        
+        <!--============================================================ -->
+        <!--编码检查 -->
+        <!--============================================================ -->
+        <!--检查空的代码段-->
+        <module name="EmptyStatement"/>
+		<!--检查switch语句是否忘记了default标签-->
+		<module name="MissingSwitchDefault" />
+		<!--检查default的clause是否在switch代码段的最后-->
+		<module name="DefaultComesLast" />
+		<!--检查switch中case后是否加入了跳出语句-->
+		<module name="FallThrough" />
+        <!--检查子表达式中是否有赋值操作 -->
+        <module name="InnerAssignment">
+			<property name="severity" value="warning"/>
+		</module>
+		<!--检查循环控制的变量是否在代码块中被修改 -->
+        <module name="ModifiedControlVariable">
+			<property name="severity" value="warning"/>
+		</module>
+		<!--检查不允许的参数赋值-->
+        <module name="ParameterAssignment">
+			<property name="severity" value="warning"/>
+		</module>
+        <!--检查是否有“magic numbers”-->
+        <module name="MagicNumber">
+			<property name="ignoreNumbers" value="-1,0,1,2,3,4,5,6,7,8,10,16,21,24,60,80,127,255,443,1000,1024"/>
+			<property name="ignoreAnnotation" value="true"/>
+		</module>        
+        <!--检查是否有被重复抛出的异常-->
+        <module name="RedundantThrows"/>
+		<!--检查是否抛出了未声明的异常-->
+        <module name="IllegalThrows"/>
+        <!--检查是否有过度复杂的布尔表达式 -->
+        <module name="SimplifyBooleanExpression"/>
+        <!--检查是否有过于复杂的布尔返回代码段 -->
+        <module name="SimplifyBooleanReturn"/>
+        <!--检查字符串是否有用==或!=进行操作-->
+        <module name="StringLiteralEquality"/>
+        <!--检查嵌套的层次深度，最多嵌套3层 -->
+        <module name="NestedIfDepth">
+            <property name="max" value="3"/>
+        </module>
+        <!--检查try的层次深度，最多嵌套1层 -->
+        <module name="NestedTryDepth">
+            <property name="max" value="1"/>
+        </module>
+        <!--限制return代码段的数量，最多5个-->
+        <module name="ReturnCount">
+            <property name="max" value="5"/>
+        </module>
+        <!--检查覆盖的clone()是否有调用super.clone()-->
+        <module name="SuperClone"/>
+        <!--检查覆盖的finalize()是否有调用super.finalize()-->
+        <module name="SuperFinalize"/>
+        <!--检查一个文件中是否有多次出现的字符串-->
+        <module name="MultipleStringLiterals">
+			<property name="allowedDuplicates" value="3"/>
+			<property name="severity" value="warning"/>
+		</module>
+        <!--检查代码段和代码行中是否有多次变量声明-->
+        <module name="MultipleVariableDeclarations"/>        
+        <!--检查是否使用工厂方法实例化-->
+        <module name="IllegalInstantiation"/>
+        <!--检查类、接口中的声明顺序-->
+        <module name="DeclarationOrder"/>
+        <!--检查局部变量或参数是否隐藏了类中的变量-->
+        <module name="HiddenField">
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+            <property name="ignoreAbstractMethods" value="true"/>
+        </module>
+        <!--检查DCL的问题-->
+        <!--<module name="DoubleCheckedLocking"/>-->
+        <!--检查一个可能为null的字符串是否在equals()比较的左边-->
+        <module name="EqualsAvoidNull"/>
+        <!--检查在重写了equals方法后是否重写了hashCode方法-->
+        <module name="EqualsHashCode"/>
+        
+        <!--============================================================ -->
+        <!--类检查-->
+        <!--============================================================ -->
+        <!--检查只有private构造函数的类是否声明为final-->
+        <module name="FinalClass"/>
+        <!--检查类成员的可见度-->
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+            <property name="packageAllowed" value="false"/>
+        </module>
+         
+        <!--============================================================ -->
+        <!--量度检查 -->
+        <!--============================================================ -->
+        <!--布尔表达式的复杂度，不超过5 -->
+        <module name="BooleanExpressionComplexity">
+			<property name="max" value="5"/>
+		</module>
+		<!--类数据的抽象耦合，不超过7 -->
+        <module name="ClassDataAbstractionCoupling">
+			<property name="severity" value="warning"/>
+		</module>
+        <!--类的分散复杂度，不超过20 -->
+        <module name="ClassFanOutComplexity">
+			<property name="severity" value="warning"/>
+		</module>
+        <!--函数的分支复杂度，不超过10 -->
+        <module name="CyclomaticComplexity">
+			<property name="severity" value="warning"/>
+		</module>
+        <!--NPath复杂度，不超过200 -->
+        <module name="NPathComplexity">
+			<property name="severity" value="warning"/>
+		</module>
+        
+         
+        <!--============================================================ -->
+        <!--其他检查 -->
+        <!--============================================================ -->
+        <!--禁止使用System.out.println -->
+        <module name="Regexp">
+            <property name="format" value="System\.out\.print"/>
+            <property name="illegalPattern" value="true"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        
+        <module name="FileContentsHolder"/>
+        
+    </module>
+    
+    <!--============================================================ -->
+    <!--杂项-->
+    <!--============================================================ -->
+    <!--检查property文件中是否有相同的key-->
+    <module name="Translation"/>
+    
+    <module name="FileLength">
+        <property name="max" value="600"/>
+		<property name="severity" value="warning"/>
+    </module>
+    
+    <module name="SuppressionCommentFilter"/>
+    
+</module>
