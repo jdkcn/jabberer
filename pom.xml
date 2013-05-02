@@ -3,7 +3,7 @@
     <groupId>com.jdkcn.jabber</groupId>
     <artifactId>jabberer</artifactId>
     <packaging>war</packaging>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
     <name>jabberer</name>
     <description>A sample java jabber bot.</description>
     <url>http://jdkcn.com</url>
@@ -40,7 +40,7 @@
         <connection>scm:git:git://github.com/jdkcn/jabberer.git</connection>
         <developerConnection>scm:git:git@github.com:jdkcn/jabberer.git</developerConnection>
         <url>https://github.com/jdkcn/jabberer</url>
-      <tag>jabberer-0.9.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <build>
         <plugins>
