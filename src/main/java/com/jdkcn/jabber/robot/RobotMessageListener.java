@@ -163,10 +163,8 @@ public class RobotMessageListener implements MessageListener {
      */
     private String findPosterName(String sender, String name) {
         for (RosterEntry entry : robot.getConnection().getRoster().getEntries()) {
-            if (entry.getUser().equalsIgnoreCase(sender)) {
-                if (StringUtils.isNotBlank(entry.getName())) {
-                    return entry.getName();
-                }
+            if (entry.getUser().equalsIgnoreCase(sender) && StringUtils.isNotBlank(entry.getName())) {
+                return entry.getName();
             }
         }
         return name;
@@ -181,43 +179,86 @@ public class RobotMessageListener implements MessageListener {
      */
     private void processCommand(Chat chat, String command, String sender) {
         if ("/l".equalsIgnoreCase(command) || "/list".equalsIgnoreCase(command)) {
-            Message message = new Message(sender, Message.Type.chat);
-            message.setBody("\nUsers：\n" + getRosterEntryNames(" \n"));
-            try {
-                chat.sendMessage(message);
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            }
+            processListCommand(chat, sender);
         } else if ("/?".equalsIgnoreCase(command) || "/h".equalsIgnoreCase(command) || "/help".equalsIgnoreCase(command)) {
-            Message message = new Message(sender, Message.Type.chat);
-            StringBuffer sb = new StringBuffer();
-            sb.append("\n Jabberer Help：\n");
-            sb.append("\t /help /h /? for help message \n");
-            sb.append("\t /list /l to list all friends. \n");
-            sb.append("\t /online /o to list online friends. \n");
-            sb.append("\t /add <account> <nickname> [groupname]... to add a user as friends. \n");
-            sb.append("\t /remove <account> to remove a user. \n");
-            sb.append("\t /name <account> <nickname> set a nickname to a user. \n");
-            message.setBody(sb.toString());
-            try {
-                chat.sendMessage(message);
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            }
+            processHelpCommand(chat, sender);
         } else if ("/online".equalsIgnoreCase(command) || "/o".equalsIgnoreCase(command)) {
-            Message message = new Message(sender, Message.Type.chat);
-            message.setBody("\n Online Users:\n" + getRosterEntryNames(true, "\n"));
-            try {
-                chat.sendMessage(message);
-            } catch (XMPPException e) {
-                e.printStackTrace();
-            }
-        } else if (command.startsWith("/add")) {
+            processOnlineCommand(chat, sender);
+        } else {
+            processCommandsWithArgs(chat, command, sender);
+        }
+    }
+
+    /**
+     * Process the command use some arguments.
+     *
+     * @param chat    the xmppchat.
+     * @param command the command.
+     * @param sender  the sender.
+     */
+    private void processCommandsWithArgs(Chat chat, String command, String sender) {
+        if (command.startsWith("/add")) {
             processAddCommand(chat, command, sender);
         } else if (command.startsWith("/name")) {
             processNameCommand(chat, command, sender);
         } else if (command.startsWith("/remove")) {
             processRemoveCommand(chat, command, sender);
+        }
+    }
+
+    /**
+     * Process the list command.
+     *
+     * @param chat   the xmpp chat.
+     * @param sender the sender.
+     */
+    private void processListCommand(Chat chat, String sender) {
+        Message message = new Message(sender, Message.Type.chat);
+        message.setBody("\nUsers：\n" + getRosterEntryNames(" \n"));
+        try {
+            chat.sendMessage(message);
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Process the online command.
+     *
+     * @param chat   the xmpp chat.
+     * @param sender the sender.
+     */
+    private void processOnlineCommand(Chat chat, String sender) {
+        Message message = new Message(sender, Message.Type.chat);
+        message.setBody("\n Online Users:\n" + getRosterEntryNames(true, "\n"));
+        try {
+            chat.sendMessage(message);
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Pocess the help command.
+     *
+     * @param chat   the xmpp chat.
+     * @param sender the sender.
+     */
+    private void processHelpCommand(Chat chat, String sender) {
+        Message message = new Message(sender, Message.Type.chat);
+        StringBuffer sb = new StringBuffer();
+        sb.append("\n Jabberer Help：\n");
+        sb.append("\t /help /h /? for help message \n");
+        sb.append("\t /list /l to list all friends. \n");
+        sb.append("\t /online /o to list online friends. \n");
+        sb.append("\t /add <account> <nickname> [groupname]... to add a user as friends. \n");
+        sb.append("\t /remove <account> to remove a user. \n");
+        sb.append("\t /name <account> <nickname> set a nickname to a user. \n");
+        message.setBody(sb.toString());
+        try {
+            chat.sendMessage(message);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
     }
 
