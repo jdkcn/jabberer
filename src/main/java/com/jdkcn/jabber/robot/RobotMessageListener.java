@@ -145,7 +145,6 @@ public class RobotMessageListener implements MessageListener {
             Message msg = new Message(entry.getUser(), Message.Type.chat);
             msg.setBody("<" + findPosterName(sender, name) + "> " + body);
             try {
-//						final MessageListener messageListener = new RobotMessageListener(connection, roster, rosterEntries, sendOfflineMessage, robot);
                 robot.getConnection().getChatManager().createChat(entry.getUser(), this).sendMessage(msg);
             } catch (XMPPException e) {
                 logger.error("send message to:" + entry.getUser(), e);
@@ -423,6 +422,4 @@ public class RobotMessageListener implements MessageListener {
         }
         return "\t" + sb.toString();
     }
-
-
 }

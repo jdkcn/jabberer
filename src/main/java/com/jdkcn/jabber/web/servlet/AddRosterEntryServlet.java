@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * add roster entry to robot.
  * User: rory
  * Date: 4/06/13
  * Time: 23:08

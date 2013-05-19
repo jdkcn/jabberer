@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * The user sign out Servlet
+ * The user sign out Servlet.
  *
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
  * @version $Id$

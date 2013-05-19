@@ -218,7 +218,7 @@ public class Robot implements Serializable {
     }
 
     /**
-     * Get the roster entry list
+     * Get the roster entry list.
      *
      * @return roster entry list or empty list.
      */
@@ -234,7 +234,7 @@ public class Robot implements Serializable {
     }
 
     /**
-     * Get the online roster entry list
+     * Get the online roster entry list.
      *
      * @return online roster entry list or empty list.
      */

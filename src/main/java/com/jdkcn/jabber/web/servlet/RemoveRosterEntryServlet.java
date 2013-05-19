@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * remove the roster entry from robot.
  * User: rory
  * Date: 4/14/13
  * Time: 15:08

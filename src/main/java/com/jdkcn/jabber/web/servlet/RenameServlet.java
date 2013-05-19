@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * rename the roster entry in the robot.
  * User: rory
  * Date: 4/15/13
  * Time: 09:08
