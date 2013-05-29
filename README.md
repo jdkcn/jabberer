@@ -1,4 +1,6 @@
-# A sample Java jabber robot
+# A sample Java xmpp robot
+
+[![Build Status](https://drone.io/github.com/jdkcn/jabberer/status.png)](https://drone.io/github.com/jdkcn/jabberer/latest)
 
 ## Signin
 
