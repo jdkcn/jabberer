@@ -9,6 +9,7 @@
     <script src="<c:url value="/assets/js/html5shiv.js"/>"></script>
     <![endif]-->
 	<!-- Le styles -->
+    <link href="<c:url value="/assets/css/app.css"/>" rel="stylesheet">
     <link href="<c:url value="/assets/css/bootstrap.min.css"/>" rel="stylesheet">
     <link href="<c:url value="/assets/css/bootstrap-responsive.min.css"/>" rel="stylesheet">
     <style>

@@ -71,21 +71,25 @@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
 					</tr>
                     <tr>
                         <td colspan="6">
-                        <c:forEach var="entry" items="${robot.rosters}">
-                            <c:set var="contains" value="false" />
-                            <c:forEach var="item" items="${robot.onlineRosters}">
-                                <c:if test="${item.user eq entry.user}">
-                                    <c:set var="contains" value="true" />
-                                </c:if>
-                            </c:forEach>
-                            <div class="btn-group">
-                                <a class="btn<c:choose><c:when test="${contains}"> btn-success</c:when><c:otherwise> btn-inverse</c:otherwise></c:choose> dropdown-toggle" href="#" data-toggle="dropdown"><i class="icon-user icon-white"></i> <c:out value="${entry.name}"/> <span class="caret"></span></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="javascript:void(0)" onclick="javascript:showRenameModal('<c:out value="${robot.name}"/>','<c:out value="${entry.user}"/>','<c:out value="${entry.name}"/>');return false;"><i class="icon-pencil"></i> Rename (<c:out value="${entry.user}"/>)</a></li>
-                                    <li><a href="<c:url value="/entry/remove"/>?robotName=<c:out value="${robot.name}"/>&entry=<c:out value="${entry.user}"/>" onclick="return window.confirm('Really delete this entry?')"><i class="icon-trash"></i> Delete (<c:out value="${entry.user}"/>)</a></li>
-                                </ul>
-                            </div>
-                        </c:forEach> &nbsp;
+	                        <ul>
+		                        <c:forEach var="entry" items="${robot.rosters}">
+		                            <c:set var="contains" value="false" />
+		                            <c:forEach var="item" items="${robot.onlineRosters}">
+		                                <c:if test="${item.user eq entry.user}">
+		                                    <c:set var="contains" value="true" />
+		                                </c:if>
+		                            </c:forEach>
+		                            <li class="ul-robots-li">
+			                            <div class="btn-group">
+			                                <a class="btn<c:choose><c:when test="${contains}"> btn-success</c:when><c:otherwise> btn-inverse</c:otherwise></c:choose> dropdown-toggle" href="#" data-toggle="dropdown"><i class="icon-user icon-white"></i> <c:out value="${entry.name}"/> <span class="caret"></span></a>
+			                                <ul class="dropdown-menu">
+			                                    <li><a href="javascript:void(0)" onclick="javascript:showRenameModal('<c:out value="${robot.name}"/>','<c:out value="${entry.user}"/>','<c:out value="${entry.name}"/>');return false;"><i class="icon-pencil"></i> Rename (<c:out value="${entry.user}"/>)</a></li>
+			                                    <li><a href="<c:url value="/entry/remove"/>?robotName=<c:out value="${robot.name}"/>&entry=<c:out value="${entry.user}"/>" onclick="return window.confirm('Really delete this entry?')"><i class="icon-trash"></i> Delete (<c:out value="${entry.user}"/>)</a></li>
+			                                </ul>
+			                            </div>
+		                            </li>
+		                        </c:forEach>
+	                        </ul>
                         </td>
                     </tr>
 			  		</c:forEach>

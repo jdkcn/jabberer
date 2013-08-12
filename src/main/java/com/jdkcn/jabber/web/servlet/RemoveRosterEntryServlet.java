@@ -30,6 +30,7 @@ package com.jdkcn.jabber.web.servlet;
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.util.Constants;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -40,6 +41,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -52,12 +54,15 @@ import java.util.List;
 @Singleton
 public class RemoveRosterEntryServlet extends HttpServlet {
 
-    @Override
+    private static final long serialVersionUID = -3888751651044128073L;
+
+	@Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String robotName = req.getParameter("robotName");
         String entry = req.getParameter("entry");
         if (StringUtils.isNotBlank(robotName) && StringUtils.isNotBlank(entry)) {
-            List<Robot> allRobots = (List<Robot>) req.getServletContext().getAttribute(Constants.ROBOTS);
+            @SuppressWarnings("unchecked")
+			List<Robot> allRobots = (List<Robot>) req.getServletContext().getAttribute(Constants.ROBOTS);
             Robot robot = null;
             for (Robot r : allRobots) {
                 if (StringUtils.equals(r.getName(), robotName)) {

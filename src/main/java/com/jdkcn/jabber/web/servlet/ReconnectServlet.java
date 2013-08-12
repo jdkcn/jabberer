@@ -83,7 +83,7 @@ public class ReconnectServlet extends HttpServlet {
         }
         if (reconnectRobot != null) {
             try {
-                if (reconnectRobot.getConnection().isConnected()) {
+                if (reconnectRobot.getConnection() != null && reconnectRobot.getConnection().isConnected()) {
                     reconnectRobot.getConnection().disconnect();
                 }
                 JsonNode jsonConfig = (JsonNode) req.getServletContext().getAttribute(Constants.JABBERERJSONCONFIG);
