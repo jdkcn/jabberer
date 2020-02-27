@@ -1,6 +1,6 @@
 # A sample Java xmpp robot
 
-[![Build Status](https://drone.io/github.com/jdkcn/jabberer/status.png)](https://drone.io/github.com/jdkcn/jabberer/latest)
+![Java CI](https://github.com/jdkcn/jabberer/workflows/Java%20CI/badge.svg)
 
 ## Signin
 
