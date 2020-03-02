@@ -152,13 +152,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.4</version>
+            <version>1.7.30</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -180,9 +180,10 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.10.2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

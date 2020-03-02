@@ -27,12 +27,12 @@
  */
 package com.jdkcn.jabber.util;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -56,7 +56,7 @@ public final class JsonUtil {
 
     static {
         m = new ObjectMapper();
-        m.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        m.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
     }
 
@@ -150,19 +150,6 @@ public final class JsonUtil {
     }
 
     /**
-     * deserializer the json object to object.
-     *
-     * @param root      the json object.
-     * @param valueType the object java class.
-     * @param <T>       full generics type.
-     * @return deserializer the json file to object.
-     * @throws IOException
-     */
-    public static <T> T fromJson(JsonNode root, Class<T> valueType) throws IOException {
-        return m.readValue(root, valueType);
-    }
-
-    /**
      * serialize the java object into json string.
      *
      * @param pojo        the java object.
@@ -172,7 +159,7 @@ public final class JsonUtil {
      */
     public static String toJson(Object pojo, boolean prettyPrint) throws IOException {
         StringWriter sw = new StringWriter();
-        JsonGenerator jg = jf.createJsonGenerator(sw);
+        JsonGenerator jg = jf.createGenerator(sw);
         if (prettyPrint) {
             jg.useDefaultPrettyPrinter();
         }
@@ -189,7 +176,7 @@ public final class JsonUtil {
      * @throws IOException
      */
     public static void toJson(Object pojo, FileWriter fw, boolean prettyPrint) throws IOException {
-        JsonGenerator jg = jf.createJsonGenerator(fw);
+        JsonGenerator jg = jf.createGenerator(fw);
         if (prettyPrint) {
             jg.useDefaultPrettyPrinter();
         }

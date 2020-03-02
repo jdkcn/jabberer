@@ -27,6 +27,7 @@
  */
 package com.jdkcn.jabber.web.listener;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -43,7 +44,6 @@ import com.jdkcn.jabber.web.servlet.RemoveRosterEntryServlet;
 import com.jdkcn.jabber.web.servlet.RenameServlet;
 import com.jdkcn.jabber.web.servlet.SigninServlet;
 import com.jdkcn.jabber.web.servlet.SignoutServlet;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

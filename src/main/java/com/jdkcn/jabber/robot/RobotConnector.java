@@ -27,7 +27,7 @@
  */
 package com.jdkcn.jabber.robot;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ChatManagerListener;
@@ -71,7 +71,7 @@ public final class RobotConnector {
         Robot robot = new Robot();
         robot.setUsername(username);
         robot.setName(robotNode.get("name").asText());
-        Boolean sendOfflineMessage = robotNode.get("send.offline.message").getBooleanValue();
+        Boolean sendOfflineMessage = robotNode.get("send.offline.message").asBoolean();
         robot.setSendOfflineMessage(sendOfflineMessage);
         findAdministrators(robot, robotNode);
         try {

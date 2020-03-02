@@ -27,11 +27,11 @@
  */
 package com.jdkcn.jabber.web.servlet;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.domain.User;
 import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.util.Constants;
-import org.codehaus.jackson.JsonNode;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;

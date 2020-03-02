@@ -27,12 +27,12 @@
  */
 package com.jdkcn.jabber.web.servlet;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.robot.Robot;
 import com.jdkcn.jabber.robot.RobotConnector;
 import com.jdkcn.jabber.util.Constants;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

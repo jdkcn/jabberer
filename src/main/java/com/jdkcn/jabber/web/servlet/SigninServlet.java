@@ -27,9 +27,9 @@
  */
 package com.jdkcn.jabber.web.servlet;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Singleton;
 import com.jdkcn.jabber.domain.User;
-import org.codehaus.jackson.JsonNode;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
